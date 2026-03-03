@@ -10,7 +10,7 @@ export const profile = {
   birthYear: "2004",
   social: {
     github: "https://github.com/hoangphuc1capri",
-    linkedin: "https://linkedin.com/in/phuc-nguyen",
+    linkedin: "www.linkedin.com/in/hoàng-phúc-nguyễn-56783a3a6",
     email: "hoangphuc.capri.0501@gmail.com"
   }
 };
@@ -23,7 +23,7 @@ export const projects = {
     subtitle: "Đồ án Doanh nghiệp - Service-Learning UEF",
     desc: "Hệ thống quản lý chuyên sâu kết nối sinh viên và các dự án xã hội cho Trung tâm Service-Learning UEF.",
     detail: "Dự án giải quyết vấn đề quản lý thủ công hàng nghìn sinh viên tham gia hoạt động cộng đồng. Hệ thống hỗ trợ đăng ký, điểm danh, và xuất báo cáo tự động.",
-    tech: ["React", "Node.js", "SQL Server", "Tailwind"],
+    tech: ["React", ".NET MVC 5", "SQL Server", "Tailwind"],
     color: "from-blue-600 to-cyan-500"
   },
   academic: [
@@ -51,14 +51,14 @@ export const projects = {
     {
       title: "Quản Lý Tài Chính",
       subject: "Lập trình Mobile",
-      tech: ["React Native", "Firebase"],
+      tech: ["Android", "Firebase"],
       icon: <Smartphone size={24} />,
       desc: "App theo dõi thu chi cá nhân cho sinh viên."
     },
     {
       title: "Quản Lý Sự Kiện",
       subject: "Lập trình Web Nâng cao",
-      tech: ["Next.js", "PostgreSQL"],
+      tech: [".NET Core", "SQL Server"],
       icon: <Calendar size={24} />,
       desc: "Nền tảng đăng ký sự kiện quy mô lớn."
     }

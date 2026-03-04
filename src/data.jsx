@@ -10,7 +10,7 @@ export const profile = {
   birthYear: "2004",
   social: {
     github: "https://github.com/hoangphuc1capri",
-    linkedin: "www.linkedin.com/in/hoàng-phúc-nguyễn-56783a3a6",
+    linkedin: "www.linkedin.com/in/sennahoangphuc0501",
     email: "hoangphuc.capri.0501@gmail.com"
   }
 };

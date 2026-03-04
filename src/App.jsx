@@ -105,7 +105,7 @@ function App() {
                   {/* Sub-headline & Quote */}
                   <div className="max-w-xl">
                     <p className="text-lg md:text-xl text-slate-500 mb-8 leading-relaxed font-medium">
-                      Xin chào, mình là <span className="text-slate-900 font-bold italic">Senna</span>. Một lập trình viên Gen Z sinh năm 2004, chuyên tâm vào <span className="text-slate-900">Web Development</span> và vận hành <span className="text-slate-900 underline decoration-blue-500/30">Kỹ thuật Sự kiện</span>.
+                      Xin chào, mình là <span className="text-slate-900 font-bold italic">Hoàng Phúc</span>. Một lập trình viên Gen Z sinh năm 2004, chuyên tâm vào <span className="text-slate-900">Web Development</span> và vận hành <span className="text-slate-900 underline decoration-blue-500/30">Kỹ thuật Sự kiện</span>.
                     </p>
 
                     {/* Quote nổi bật từ bài báo */}

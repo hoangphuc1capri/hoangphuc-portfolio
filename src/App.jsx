@@ -92,7 +92,7 @@ function App() {
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
                     </span>
                     <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                      Software Engineering Student • UEF
+                      Web Developer Student • UEF
                     </span>
                   </div>
 
@@ -169,7 +169,7 @@ function App() {
                         <div className="p-2 bg-blue-50 text-blue-600 rounded-xl shadow-inner"><Code2 size={24} /></div>
                         <div>
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Specializing in</p>
-                          <p className="text-sm font-bold text-slate-800 tracking-tight">Software Engineering</p>
+                          <p className="text-sm font-bold text-slate-800 tracking-tight">Web Developer</p>
                         </div>
                       </div>
                     </motion.div>

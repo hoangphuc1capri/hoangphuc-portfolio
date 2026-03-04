@@ -21,6 +21,9 @@ function App() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
+  const [activeProjImgIndex, setActiveProjImgIndex] = useState(0);
+  const nextProjImage = (e) => { e.stopPropagation(); setActiveProjImgIndex((prev) => (prev === selectedProject.images.length - 1 ? 0 : prev + 1)); };
+  const prevProjImage = (e) => { e.stopPropagation(); setActiveProjImgIndex((prev) => (prev === 0 ? selectedProject.images.length - 1 : prev - 1)); };
   // Hàm chuyển ảnh cho Event
   const nextImage = (e) => {
     e.stopPropagation();
@@ -376,35 +379,104 @@ function App() {
         </footer>
       </main>
 
-      {/* =========================================
-          MODAL 1: CHI TIẾT DỰ ÁN SOFTWARE
+{/* =========================================
+          MODAL 1: CHI TIẾT DỰ ÁN SOFTWARE (GALLERY)
           ========================================= */}
       <AnimatePresence>
         {selectedProject && (
-          <motion.div
+          <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-6"
+            className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
             onClick={() => setSelectedProject(null)}
           >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-              className="bg-white border border-slate-200 p-8 md:p-12 rounded-[3rem] max-w-2xl w-full relative shadow-2xl"
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+              className="bg-white rounded-[2rem] overflow-hidden w-full max-w-5xl max-h-[90vh] flex flex-col md:flex-row shadow-2xl relative"
               onClick={e => e.stopPropagation()}
             >
-              <button onClick={() => setSelectedProject(null)} className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 bg-slate-100 p-2 rounded-full"><X size={20} /></button>
-              <span className="text-blue-600 text-[10px] font-black uppercase tracking-widest">{selectedProject.subtitle}</span>
-              <h2 className="text-4xl font-black text-slate-900 mt-4 mb-8 tracking-tighter">{selectedProject.title}</h2>
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Chi tiết dự án</h4>
-                  <p className="text-slate-600 font-medium leading-relaxed">{selectedProject.detail || selectedProject.desc}</p>
+              {/* Nút Đóng */}
+              <button onClick={() => setSelectedProject(null)} className="absolute top-4 right-4 z-50 bg-white/80 hover:bg-white text-slate-800 p-2 rounded-full backdrop-blur-md transition shadow-sm">
+                <X size={20} />
+              </button>
+
+              {/* Trái: Khu vực hiển thị ảnh Web (Carousel) */}
+              <div className="w-full md:w-3/5 bg-slate-100 relative group aspect-[4/3] md:aspect-auto flex items-center justify-center overflow-hidden border-b md:border-b-0 md:border-r border-slate-200">
+                {selectedProject.images && selectedProject.images.length > 0 ? (
+                  <>
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={activeProjImgIndex}
+                        src={selectedProject.images[activeProjImgIndex]}
+                        alt="Screenshot Web"
+                        className="w-full h-full object-contain bg-slate-200" // object-contain để không bị cắt mất UI web
+                        initial={{ opacity: 0, scale: 1.02 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </AnimatePresence>
+
+                    {/* Nút qua lại nếu có nhiều ảnh */}
+                    {selectedProject.images.length > 1 && (
+                      <>
+                        <button onClick={prevProjImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100">
+                          <ChevronLeft size={24} />
+                        </button>
+                        <button onClick={nextProjImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100">
+                          <ChevronRight size={24} />
+                        </button>
+                        {/* Dots */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/20 px-3 py-1.5 rounded-full backdrop-blur-md">
+                          {selectedProject.images.map((_, idx) => (
+                            <div key={idx} className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === activeProjImgIndex ? 'bg-white w-6' : 'bg-white/50'}`}></div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                   <div className="text-slate-400 font-bold uppercase tracking-widest text-sm">NO IMAGE AVAILABLE</div>
+                )}
+              </div>
+
+              {/* Phải: Thông tin hệ thống */}
+              <div className="w-full md:w-2/5 p-8 md:p-10 flex flex-col bg-white overflow-y-auto max-h-[50vh] md:max-h-none">
+                <span className="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2">
+                  {selectedProject.subtitle}
+                </span>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                  {selectedProject.title}
+                </h2>
+                
+                <h4 className="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Mô tả hệ thống</h4>
+                <p className="text-slate-600 text-sm mb-8 leading-relaxed font-medium">
+                  {selectedProject.detail || selectedProject.desc}
+                </p>
+
+                <h4 className="text-xs font-black uppercase text-slate-400 mb-3 tracking-widest">Tech Stack</h4>
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {selectedProject.tech.map(t => (
+                    <span key={t} className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-xs font-bold">{t}</span>
+                  ))}
                 </div>
-                <div>
-                  <h4 className="text-xs font-black uppercase text-slate-400 mb-3 tracking-widest">Công nghệ cốt lõi</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProject.tech.map(t => <span key={t} className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold border border-blue-100">{t}</span>)}
+
+                {/* Grid ảnh thu nhỏ (Thumbnails) */}
+                {selectedProject.images && selectedProject.images.length > 1 && (
+                  <div className="mt-auto">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Giao diện ({selectedProject.images.length})</h4>
+                    <div className="grid grid-cols-4 gap-2">
+                      {selectedProject.images.map((img, idx) => (
+                        <button 
+                          key={idx} 
+                          onClick={() => setActiveProjImgIndex(idx)} 
+                          className={`rounded-lg overflow-hidden border-2 transition-all ${activeProjImgIndex === idx ? 'border-blue-500 scale-95 opacity-100' : 'border-slate-100 hover:border-blue-300 opacity-60'}`}
+                        >
+                          <img src={img} className="w-full h-full object-cover aspect-video" alt="thumbnail" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

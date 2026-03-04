@@ -24,7 +24,10 @@ export const projects = {
     desc: "Hệ thống quản lý chuyên sâu kết nối sinh viên và các dự án xã hội cho Trung tâm Service-Learning UEF.",
     detail: "Dự án giải quyết vấn đề quản lý thủ công hàng nghìn sinh viên tham gia hoạt động cộng đồng. Hệ thống hỗ trợ đăng ký, điểm danh, và xuất báo cáo tự động.",
     tech: ["React", ".NET MVC 5", "SQL Server", "Tailwind"],
-    color: "from-blue-600 to-cyan-500"
+    color: "from-blue-600 to-cyan-500",
+    images:[
+      "/projects/csl-1.png", // Đổi tên file cho khớp với ảnh thật của bạn
+    ]
   },
   academic: [
     {

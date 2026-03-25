@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV - Nguyễn Hoàng Phúc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: white;
+            }
+
+            .a4-page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 210mm;
+                height: 297mm;
+                padding: 10mm !important;
+            }
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .section-title {
+            border-left: 4px solid #2563eb;
+            padding-left: 10px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            color: #1e40af;
+            margin-bottom: 10px;
+            margin-top: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="no-print flex justify-center py-5">
+        <button onclick="window.print()"
+            class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-blue-700 transition">
+            In hoặc Tải về PDF (A4, Không lề)
+        </button>
+    </div>
+
+    <div class="a4-page text-slate-800">
+        <!-- HEADER MỚI: HIỆN ĐẠI - GỌN GÀNG - CHUYÊN NGHIỆP -->
+        <header class="flex flex-row items-center gap-10 border-b-4 border-blue-600 pb-8 relative">
+
+            <!-- 1. KHUNG ẢNH CÁ NHÂN (Bên trái, kích thước lớn) -->
+            <div class="relative flex-shrink-0">
+                <!-- Hiệu ứng đổ bóng trang trí phía sau -->
+                <div class="absolute inset-0 bg-blue-100 rounded-3xl rotate-6 scale-105"></div>
+
+                <div class="relative w-44 h-44 bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl">
+                    <img src="avatar.png" alt="Nguyễn Hoàng Phúc"
+                        class="w-full h-full object-contain scale-110 translate-y-3">
+                </div>
+            </div>
+
+            <!-- 2. THÔNG TIN CÁ NHÂN (Bên phải) -->
+            <div class="flex-1">
+                <h1 class="text-6xl font-[900] text-slate-900 tracking-tighter uppercase leading-none">
+                    Nguyễn Hoàng <span class="text-blue-600">Phúc</span>
+                </h1>
+
+                <p
+                    class="text-lg font-extrabold text-slate-500 tracking-[0.2em] mt-3 uppercase italic border-b border-slate-100 pb-2">
+                    Web Developer Student <br/> Technical Event Leader
+                </p>
+
+                <!-- Lưới thông tin liên hệ (2 cột sạch sẽ) -->
+                <div
+                    class="mt-4 grid grid-cols-2 gap-x-8 gap-y-2 text-[11px] font-bold text-slate-600 uppercase tracking-tighter">
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-blue-600 text-[10px]">📞</span>
+                        0844.790.999
+                    </div>
+                    <div class="flex items-center gap-2 text-blue-600">
+                        <span
+                            class="w-5 h-5 bg-blue-50 rounded-md flex items-center justify-center text-[10px]">📧</span>
+                        hoangphuc.capri.0501@email.com
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="w-5 h-5 bg-slate-100 rounded-md flex items-center justify-center text-[10px]">📍</span>
+                        Bình Thạnh, TP. HCM
+                    </div>
+                    <div class="flex items-center gap-2 text-blue-600">
+                        <span
+                            class="w-5 h-5 bg-blue-50 rounded-md flex items-center justify-center text-[10px]">🌐</span>
+                        sennahoangphuc.vercel.app
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. QUOTE (Góc trên cùng bên phải - Tinh tế) -->
+            <div class="absolute top-0 right-0 hidden lg:block">
+                <div class="bg-slate-50 border-l-4 border-blue-600 p-3 max-w-[200px] shadow-sm">
+                    <p class="italic text-slate-700 text-[10px] font-bold leading-tight">
+                        "Mình làm việc dựa trên kỷ luật chứ không phải bằng động lực."
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- PROFESSIONAL SUMMARY -->
+        <section class="mt-4">
+            <h3 class="section-title !mt-0">Tóm tắt chuyên môn</h3>
+            <p class="text-[12px] leading-relaxed text-slate-600 font-medium">
+                Sinh viên năm cuối ngành CNTT tại UEF với tư duy thực chiến và kỷ luật cao. Có kinh nghiệm xây dựng ứng
+                dụng Web Fullstack và điều phối kỹ thuật cho các sự kiện quy mô lớn. Thế mạnh là khả năng <strong>giải
+                    quyết vấn đề thực tế</strong> và giữ vững hiệu suất làm việc dưới áp lực cao.
+            </p>
+        </section>
+
+        <div class="grid grid-cols-12 gap-6 mt-1">
+            <!-- LEFT COLUMN -->
+            <div class="col-span-4 border-r border-slate-50 pr-4">
+                <h3 class="section-title">Học vấn</h3>
+                <div class="mb-4">
+                    <p class="font-bold text-slate-800 text-xs tracking-tight">ĐH Kinh tế - Tài chính (UEF)</p>
+                    <p class="text-[10px] text-blue-600 font-black uppercase tracking-tighter">2022 - 2026 (Năm cuối)
+                    </p>
+                    <p class="text-[11px] text-slate-500 mt-1 font-medium italic">Công nghệ Phần mềm</p>
+                </div>
+
+                <h3 class="section-title">Kỹ năng cốt lõi</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Lập trình</p>
+                        <p class="text-[11px] font-bold text-slate-700">Java, C#, JS (ES6+), Node.js, React, Spring
+                            Boot, React Native</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Hệ quản trị CSDL</p>
+                        <p class="text-[11px] font-bold text-slate-700">SQL Server, MySQL, MongoDB</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kỹ thuật Sự kiện</p>
+                        <p class="text-[11px] font-bold text-slate-700">Vận hành AV, Stage LED, Livestream Technical
+                            Support</p>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Kỹ năng mềm</h3>
+                <ul class="text-[11px] text-slate-600 space-y-1 font-bold italic">
+                    <li>• Quản lý nhóm (Leadership)</li>
+                    <li>• Giải quyết sự cố (Troubleshooting)</li>
+                    <li>• Tư duy Kỷ luật & Trách nhiệm</li>
+                    <li>• Quản lý thời gian & Deadline</li>
+                </ul>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-span-8">
+                <h3 class="section-title text-blue-600 !mt-0">Dự án trọng điểm (Doanh nghiệp)</h3>
+                <div class="mb-5">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-slate-900 text-[14px]">Web Quản lý Hoạt động Cộng đồng</h4>
+                        <span class="text-[9px] font-black text-slate-300 italic tracking-tighter uppercase">UEF
+                            Service-Learning</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 mt-1 leading-relaxed font-medium">
+                        Xây dựng nền tảng quản lý dữ liệu tập trung. <strong>Kết quả:</strong> Tự động hóa quy trình
+                        đăng ký và xuất báo cáo cho hơn 500 sinh viên, thay thế hoàn toàn phương thức quản lý thủ công,
+                        tăng 60% hiệu suất vận hành.
+                    </p>
+                    <p class="text-[9px] font-black mt-1 text-blue-500 uppercase tracking-widest">Stack: .NET MVC 5,
+                        SQL Server, Tailwind</p>
+                </div>
+
+                <h3 class="section-title">Kinh nghiệm Vận hành Kỹ thuật</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold text-slate-800 text-[12px] italic underline">Technical Leader / AV
+                                Operator</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase">2023 - 2026</p>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-bold mb-1">Vietnam Innovation Summit, BridgeFest,
+                            Unitour...</p>
+                        <ul class="text-[11px] text-slate-600 space-y-0.5 list-disc ml-4 font-medium italic">
+                            <li>Thiết lập tín hiệu và điều phối hệ thống LED sân khấu lớn.</li>
+                            <li>Xử lý sự cố kỹ thuật "real-time" trong các sự kiện trực tiếp.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="section-title text-slate-400 border-slate-200">Đồ án tiêu biểu</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="border border-slate-100 p-2 rounded-xl bg-slate-50/50">
+                        <p class="font-bold text-slate-800 text-[10px]">Quản lý Nhà hàng (C#, .NET)</p>
+                    </div>
+                    <div class="border border-slate-100 p-2 rounded-xl bg-slate-50/50">
+                        <p class="font-bold text-slate-800 text-[10px]">Java E-Commerce (Spring Boot)</p>
+                    </div>
+                    <div class="border border-slate-100 p-2 rounded-xl bg-slate-50/50">
+                        <p class="font-bold text-slate-800 text-[10px]">Quản lý Tài chính (Android Mobile App)</p>
+                    </div>
+                    <div class="border border-slate-100 p-2 rounded-xl bg-slate-50/50">
+                        <p class="font-bold text-slate-800 text-[10px]">Quản lý Sự kiện (.NET Core)</p>
+                    </div>
+                </div>
+
+                <!-- NGƯỜI THAM CHIẾU (REFERENCES) -->
+                <h3 class="section-title text-blue-800 border-blue-800 uppercase tracking-[0.2em]">Người tham chiếu</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="font-bold text-slate-900 text-[11px]">ThS. Trần Thị Mỹ Phượng</p>
+                        <p class="text-[10px] text-blue-600 font-bold italic">Giám đốc Trung tâm Kết nối cộng đồng UEF
+                        </p>
+                        <p class="text-[10px] text-slate-500 font-medium">Email: phuongttm@uef.edu.vn</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-900 text-[11px]">ThS. Hoàng Văn Hiếu</p>
+                        <p class="text-[10px] text-blue-600 font-bold italic">Giảng viên Khoa CNTT - UEF</p>
+                        <p class="text-[10px] text-slate-500 font-medium">Email: hieuhv@uef.edu.vn</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer
+            class="absolute bottom-8 left-[12mm] right-[12mm] border-t-2 border-slate-100 pt-3 flex justify-between items-center">
+            <p class="text-[8px] font-black text-slate-300 uppercase tracking-[0.4em]">Discipline is the DNA of success.
+            </p>
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter italic">sennahoangphuc.vercel.app
+            </p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

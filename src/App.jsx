@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Mail, Code2, Headphones, FileText, Users, X, Camera, Database, Layout, ChevronRight, Images, ChevronLeft, Quote, ExternalLink } from 'lucide-react';
+import { Github, Linkedin, Mail, Code2, Headphones, FileText, X, Camera, Layout, ChevronRight, Images, ChevronLeft, Quote, ExternalLink, RefreshCw, Wifi, Eye, Maximize2 } from 'lucide-react';
 import { profile, projects, events, techStack, timeline } from './data';
 
 const containerVariants = {
@@ -13,18 +13,185 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
 };
 
+function LivePreview({ url, title }) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const statusLabel = useMemo(() => {
+    if (loaded) return 'Live preview đang hoạt động';
+    if (failed) return 'Live preview tạm không ổn định';
+    return retryCount > 0 ? 'Đang thử kết nối lại live preview' : 'Đang kết nối tới website trực tiếp';
+  }, [failed, loaded, retryCount]);
+
+  useEffect(() => {
+    setLoaded(false);
+    setFailed(false);
+    setReloadKey(0);
+    setRetryCount(0);
+    setIsFullscreen(false);
+  }, [url]);
+
+  useEffect(() => {
+    if (loaded || failed) return undefined;
+
+    const timer = setTimeout(() => {
+      if (retryCount < 1) {
+        setRetryCount((current) => current + 1);
+        setReloadKey((current) => current + 1);
+        return;
+      }
+
+      setFailed(true);
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, [failed, loaded, reloadKey, retryCount]);
+
+  const reloadPreview = () => {
+    setFailed(false);
+    setLoaded(false);
+    setRetryCount(0);
+    setReloadKey((current) => current + 1);
+  };
+
+  const Frame = ({ fullscreen = false }) => (
+    <div className={`relative ${fullscreen ? 'w-[min(92vw,1280px)] h-[85vh]' : 'w-full h-full'} bg-gradient-to-br from-slate-100 via-white to-slate-200 overflow-hidden`}>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.10),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.08),transparent_30%)]" />
+
+      {!failed && (
+        <iframe
+          key={`${url}-${reloadKey}-${fullscreen ? 'fullscreen' : 'inline'}`}
+          src={url}
+          title={title}
+          className={`absolute inset-0 w-full h-full border-0 transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          onLoad={() => {
+            setLoaded(true);
+            setFailed(false);
+          }}
+          onError={() => {
+            if (retryCount < 1) {
+              setRetryCount((current) => current + 1);
+              setReloadKey((current) => current + 1);
+              return;
+            }
+
+            setFailed(true);
+          }}
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+      )}
+
+      <div className={`absolute inset-0 z-10 p-6 md:p-8 flex flex-col justify-between transition-opacity duration-500 ${loaded && !failed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-rose-400" />
+            <span className="w-3 h-3 rounded-full bg-amber-400" />
+            <span className="w-3 h-3 rounded-full bg-emerald-400" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Live Preview
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(true)}
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-300 transition-colors"
+            >
+              <Maximize2 size={16} />
+            </button>
+          </div>
+        </div>
+
+        <div className="self-center w-full max-w-2xl rounded-[1.75rem] border border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_20px_60px_rgba(15,_23,_42,_0.10)] p-6 md:p-8 text-center">
+          <h3 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 mb-4">{title}</h3>
+          <p className="text-sm md:text-base text-slate-500 leading-relaxed mb-6">
+            {failed
+              ? 'Website này hiện không ổn định khi nhúng bằng iframe. Bạn có thể tải lại hoặc mở website trực tiếp ở tab mới.'
+              : 'Portfolio đang giữ chế độ live preview hoàn toàn. Nếu website phản hồi chậm, hệ thống sẽ tự thử lại một lần.'}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={reloadPreview}
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600 transition-colors"
+            >
+              <RefreshCw size={16} /> Tải lại live preview
+            </button>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-blue-50 text-blue-700 text-sm font-bold border border-blue-100 hover:bg-blue-100 transition-colors"
+            >
+              <ExternalLink size={16} /> Mở website
+            </a>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 text-[11px] text-slate-500 font-medium">
+          <span>{statusLabel}</span>
+          {!failed ? (
+            <div className="flex items-center gap-2 text-blue-600">
+              {!loaded && <div className="w-5 h-5 border-[3px] border-blue-200 border-t-blue-600 rounded-full animate-spin" />}
+              <span>{loaded ? 'Connected' : retryCount === 0 ? 'Loading' : 'Retrying once'}</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
+              <Wifi size={14} />
+              <span>Unavailable in iframe</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <Frame />
+
+      <AnimatePresence>
+        {isFullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[80] bg-slate-950/80 backdrop-blur-md p-4 md:p-8 flex items-center justify-center"
+            onClick={() => setIsFullscreen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 20 }}
+              transition={{ duration: 0.25 }}
+              className="relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(false)}
+                className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/90 text-slate-900 shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+              <Frame fullscreen />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 function App() {
-  const [selectedProject, setSelectedProject] = useState(null);
   const [activeView, setActiveView] = useState('developer');
 
   // State mới cho Event Gallery Modal
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  const [activeProjImgIndex, setActiveProjImgIndex] = useState(0);
-  const nextProjImage = (e) => { e.stopPropagation(); setActiveProjImgIndex((prev) => (prev === selectedProject.images.length - 1 ? 0 : prev + 1)); };
-  const prevProjImage = (e) => { e.stopPropagation(); setActiveProjImgIndex((prev) => (prev === 0 ? selectedProject.images.length - 1 : prev - 1)); };
-  // Hàm chuyển ảnh cho Event
   const nextImage = (e) => {
     e.stopPropagation();
     setActiveImageIndex((prev) => (prev === selectedEvent.images.length - 1 ? 0 : prev + 1));
@@ -68,14 +235,12 @@ function App() {
         </div>
       </nav>
 
-      <main className="relative z-10 max-w-6xl mx-auto px-6 pt-32 md:pt-40">
-        <AnimatePresence mode="wait">
-
+      <main className="relative z-10 max-w-[90rem] mx-auto px-6 pt-32 md:pt-40">
+        <div className={`${activeView === 'developer' ? 'block' : 'hidden'}`}>
           {/* =========================================
               TRANG 1: Web Developer (Giữ nguyên)
               ========================================= */}
-          {activeView === 'developer' && (
-            <motion.div key="developer" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+          <motion.div animate={{ opacity: activeView === 'developer' ? 1 : 0, x: activeView === 'developer' ? 0 : -20 }} transition={{ duration: 0.3 }}>
               {/* =========================================
     HERO SECTION: THE "DISCIPLINE" ENGINEER
     ========================================= */}
@@ -231,51 +396,80 @@ function App() {
                 </div>
               </section>
 
-              {/* Featured Project */}
-              <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="py-16">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-blue-600 mb-8">Dự án doanh nghiệp</h3>
-                <motion.div whileHover={{ y: -8, scale: 1.01 }} transition={{ type: "spring", stiffness: 300 }} className="group rounded-[2.5rem] p-8 md:p-12 bg-white border border-slate-200 shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] cursor-pointer relative overflow-hidden" onClick={() => setSelectedProject(projects.featured)}>
-                  <div className="absolute top-0 -inset-full h-full w-1/2 z-0 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6"><Users size={24} /></div>
-                    <h4 className="text-blue-600 text-xs font-bold uppercase tracking-widest">{projects.featured.subtitle}</h4>
-                    <h2 className="text-3xl md:text-5xl font-black mt-4 mb-4 tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">{projects.featured.title}</h2>
-                    <p className="text-slate-500 mb-8 max-w-3xl leading-relaxed text-lg">{projects.featured.desc}</p>
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {projects.featured.tech.map(t => <span key={t} className="px-4 py-2 bg-slate-50 text-slate-600 border border-slate-100 rounded-xl text-xs font-bold uppercase">{t}</span>)}
-                    </div>
-                    <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
-                      Xem chi tiết <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.section>
-
-              {/* Academic Projects */}
+              {/* Personal Projects */}
               <section className="py-16">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Đồ án môn học tiêu biểu</h3>
-                <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {projects.academic.map((p, i) => (
-                    <motion.div key={i} variants={itemVariants} whileHover={{ y: -5 }} className="bg-white border border-slate-200/60 p-8 rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group flex flex-col h-full">
-                      <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition duration-300 mb-6">{p.icon}</div>
-                      <h5 className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3">{p.subject}</h5>
-                      <h4 className="text-xl font-bold mb-4 tracking-tight">{p.title}</h4>
-                      <p className="text-sm text-slate-500 mb-8 flex-1 leading-relaxed">{p.desc}</p>
-                      <div className="flex flex-wrap gap-2 mt-auto">
-                        {p.tech.map(t => <span key={t} className="text-[9px] text-slate-400 font-bold uppercase bg-slate-50 border border-slate-100 px-2 py-1 rounded">{t}</span>)}
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+                  <div>
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-3">Dự án cá nhân</h3>
+                    <p className="text-slate-500 max-w-2xl leading-relaxed font-medium">
+                      Ba sản phẩm mình trực tiếp xây dựng, tập trung vào trải nghiệm người dùng, hiệu quả vận hành và khả năng triển khai thực tế.
+                    </p>
+                  </div>
+                </div>
+
+                <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }} className="grid grid-cols-1 gap-12">
+                  {projects.personal.map((p, i) => (
+                    <motion.article
+                      key={p.title}
+                      variants={itemVariants}
+                      whileHover={{ y: -6 }}
+                      className="bg-white border border-slate-200/60 rounded-[2.25rem] shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 overflow-hidden group grid xl:grid-cols-[minmax(0,1.9fr)_minmax(360px,0.85fr)]"
+                    >
+                      <div className="relative min-h-[440px] md:min-h-[560px] xl:min-h-[640px] border-b xl:border-b-0 xl:border-r border-slate-200 bg-slate-100 overflow-hidden">
+                        {p.link ? (
+                          <LivePreview url={p.link} title={p.title} />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-8 text-center">
+                            <div className="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center">
+                              <Layout size={28} className="text-slate-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-slate-600 font-bold text-sm">Preview không khả dụng</p>
+                              <p className="text-slate-400 text-xs">Dự án này hiện chưa có live preview.</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </motion.div>
+
+                      <div className="p-8 md:p-10 flex flex-col flex-1">
+                        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition duration-300 mb-6">
+                          {p.icon}
+                        </div>
+
+                        <h5 className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3">{p.subtitle}</h5>
+                        <h4 className="text-3xl md:text-4xl font-black mb-4 tracking-tight text-slate-900">{p.title}</h4>
+                        <p className="text-sm md:text-base text-slate-500 mb-6 leading-relaxed">{p.desc}</p>
+                        <p className="text-sm md:text-[15px] text-slate-400 mb-8 leading-relaxed flex-1">{p.detail}</p>
+
+                        <div className="flex flex-wrap gap-2 mb-8">
+                          {p.tech.map((t) => (
+                            <span key={t} className="text-[10px] text-slate-500 font-bold uppercase bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg">{t}</span>
+                          ))}
+                        </div>
+
+                        {p.link && (
+                          <a
+                            href={p.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 mt-auto px-5 py-3.5 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600 transition-colors w-fit"
+                          >
+                            Truy cập website <ExternalLink size={16} />
+                          </a>
+                        )}
+                      </div>
+                    </motion.article>
                   ))}
                 </motion.div>
               </section>
             </motion.div>
-          )}
+          </div>
 
           {/* =========================================
               TRANG 2: EVENT TECH (ĐÃ NÂNG CẤP ĐA ẢNH)
               ========================================= */}
-          {activeView === 'event' && (
-            <motion.div key="event" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+          <div className={`${activeView === 'event' ? 'block' : 'hidden'}`}>
+            <motion.div animate={{ opacity: activeView === 'event' ? 1 : 0, x: activeView === 'event' ? 0 : 20 }} transition={{ duration: 0.3 }}>
 
               <section className="pb-20 text-center flex flex-col items-center">
                 <div className="inline-flex justify-center items-center w-16 h-16 rounded-3xl bg-rose-100 text-rose-600 mb-6 shadow-sm">
@@ -359,9 +553,7 @@ function App() {
                 </div>
               </section>
             </motion.div>
-          )}
-
-        </AnimatePresence>
+          </div>
 
         {/* --- FOOTER CHUNG --- */}
         <footer className="py-20 border-t border-slate-200">
@@ -378,110 +570,6 @@ function App() {
           </div>
         </footer>
       </main>
-
-{/* =========================================
-          MODAL 1: CHI TIẾT DỰ ÁN SOFTWARE (GALLERY)
-          ========================================= */}
-      <AnimatePresence>
-        {selectedProject && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
-            onClick={() => setSelectedProject(null)}
-          >
-            <motion.div 
-              initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
-              className="bg-white rounded-[2rem] overflow-hidden w-full max-w-5xl max-h-[90vh] flex flex-col md:flex-row shadow-2xl relative"
-              onClick={e => e.stopPropagation()}
-            >
-              {/* Nút Đóng */}
-              <button onClick={() => setSelectedProject(null)} className="absolute top-4 right-4 z-50 bg-white/80 hover:bg-white text-slate-800 p-2 rounded-full backdrop-blur-md transition shadow-sm">
-                <X size={20} />
-              </button>
-
-              {/* Trái: Khu vực hiển thị ảnh Web (Carousel) */}
-              <div className="w-full md:w-3/5 bg-slate-100 relative group aspect-[4/3] md:aspect-auto flex items-center justify-center overflow-hidden border-b md:border-b-0 md:border-r border-slate-200">
-                {selectedProject.images && selectedProject.images.length > 0 ? (
-                  <>
-                    <AnimatePresence mode="wait">
-                      <motion.img
-                        key={activeProjImgIndex}
-                        src={selectedProject.images[activeProjImgIndex]}
-                        alt="Screenshot Web"
-                        className="w-full h-full object-contain bg-slate-200" // object-contain để không bị cắt mất UI web
-                        initial={{ opacity: 0, scale: 1.02 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </AnimatePresence>
-
-                    {/* Nút qua lại nếu có nhiều ảnh */}
-                    {selectedProject.images.length > 1 && (
-                      <>
-                        <button onClick={prevProjImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100">
-                          <ChevronLeft size={24} />
-                        </button>
-                        <button onClick={nextProjImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100">
-                          <ChevronRight size={24} />
-                        </button>
-                        {/* Dots */}
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/20 px-3 py-1.5 rounded-full backdrop-blur-md">
-                          {selectedProject.images.map((_, idx) => (
-                            <div key={idx} className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === activeProjImgIndex ? 'bg-white w-6' : 'bg-white/50'}`}></div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </>
-                ) : (
-                   <div className="text-slate-400 font-bold uppercase tracking-widest text-sm">NO IMAGE AVAILABLE</div>
-                )}
-              </div>
-
-              {/* Phải: Thông tin hệ thống */}
-              <div className="w-full md:w-2/5 p-8 md:p-10 flex flex-col bg-white overflow-y-auto max-h-[50vh] md:max-h-none">
-                <span className="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2">
-                  {selectedProject.subtitle}
-                </span>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-                  {selectedProject.title}
-                </h2>
-                
-                <h4 className="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Mô tả hệ thống</h4>
-                <p className="text-slate-600 text-sm mb-8 leading-relaxed font-medium">
-                  {selectedProject.detail || selectedProject.desc}
-                </p>
-
-                <h4 className="text-xs font-black uppercase text-slate-400 mb-3 tracking-widest">Tech Stack</h4>
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {selectedProject.tech.map(t => (
-                    <span key={t} className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-xs font-bold">{t}</span>
-                  ))}
-                </div>
-
-                {/* Grid ảnh thu nhỏ (Thumbnails) */}
-                {selectedProject.images && selectedProject.images.length > 1 && (
-                  <div className="mt-auto">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Giao diện ({selectedProject.images.length})</h4>
-                    <div className="grid grid-cols-4 gap-2">
-                      {selectedProject.images.map((img, idx) => (
-                        <button 
-                          key={idx} 
-                          onClick={() => setActiveProjImgIndex(idx)} 
-                          className={`rounded-lg overflow-hidden border-2 transition-all ${activeProjImgIndex === idx ? 'border-blue-500 scale-95 opacity-100' : 'border-slate-100 hover:border-blue-300 opacity-60'}`}
-                        >
-                          <img src={img} className="w-full h-full object-cover aspect-video" alt="thumbnail" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* =========================================
           MODAL 2: THƯ VIỆN ẢNH SỰ KIỆN (MỚI)

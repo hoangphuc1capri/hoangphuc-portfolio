@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
@@ -10,11 +10,15 @@ import {
   ChevronDown,
   Mail,
   ExternalLink,
-  Music,
-  Music2
+  VolumeX,
+  Volume2,
 } from 'lucide-react';
 import { profile } from '../data';
-import { inviteUrls } from '../guests';
+
+// ⬇️ Đặt file nhạc nền vào thư mục `public/` của project.
+// Gợi ý nhạc: piano không lời, ballad nhẹ nhàng (Canon in D, A Thousand Years, River Flows in You...).
+// Ví dụ đặt file: public/bgm.mp3 — code sẽ tự load.
+const BGM_URL = '/bgm.mp3';
 
 const EVENT_INFO = {
   date: '2026-08-28T15:00:00+07:00',
@@ -46,11 +50,11 @@ function useCountdown(targetDate) {
 
 function CountdownBlock({ value, label }) {
   return (
-    <div className="flex flex-col items-center justify-center bg-white/80 backdrop-blur-md border border-blue-100 rounded-2xl px-3 py-4 md:px-5 md:py-5 min-w-[70px] md:min-w-[90px] shadow-lg shadow-blue-500/5">
-      <span className="text-2xl md:text-4xl font-black tracking-tighter text-slate-900 tabular-nums">
+    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/60 to-blue-950/60 backdrop-blur-md border border-amber-400/20 rounded-2xl px-3 py-4 md:px-5 md:py-5 min-w-[70px] md:min-w-[90px] shadow-lg shadow-amber-500/10">
+      <span className="text-2xl md:text-4xl font-black tracking-tighter text-amber-400 tabular-nums">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mt-1">
+      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-amber-300/80 mt-1">
         {label}
       </span>
     </div>
@@ -78,8 +82,8 @@ function FloatingPetal({ delay, duration, left, size }) {
         />
         <defs>
           <linearGradient id="petal-gradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#fda4af" />
-            <stop offset="100%" stopColor="#fb7185" />
+            <stop offset="0%" stopColor="#fcd34d" />
+            <stop offset="100%" stopColor="#f59e0b" />
           </linearGradient>
         </defs>
       </svg>
@@ -91,6 +95,7 @@ export default function Invitation({ guestName = 'Quý khách' }) {
   const countdown = useCountdown(EVENT_INFO.date);
   const [opened, setOpened] = useState(false);
   const [musicPlaying, setMusicPlaying] = useState(false);
+  const audioRef = useRef(null);
 
   // Khi URL có query ?open=1 thì auto mở thiệp (tiện cho việc preview / share)
   useEffect(() => {
@@ -98,6 +103,34 @@ export default function Invitation({ guestName = 'Quý khách' }) {
     const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
     if (params.get('open') === '1') setOpened(true);
   }, []);
+
+  // Setup audio element
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const audio = new Audio(BGM_URL);
+    audio.loop = true;
+    audio.volume = 0.35; // nhạc nền nhẹ nhàng
+    audioRef.current = audio;
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
+
+  // Đồng bộ state ↔ audio play/pause
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (musicPlaying) {
+      audio.play().catch((err) => {
+        // Trình duyệt chặn autoplay → reset state
+        console.warn('Audio play blocked:', err);
+        setMusicPlaying(false);
+      });
+    } else {
+      audio.pause();
+    }
+  }, [musicPlaying]);
 
   const formattedGuestName = useMemo(() => {
     const trimmed = (guestName || '').trim();
@@ -116,12 +149,12 @@ export default function Invitation({ guestName = 'Quý khách' }) {
   }, [formattedGuestName]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 text-slate-900 font-sans selection:bg-rose-100 selection:text-rose-600 relative overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a1f44] via-[#0d2552] to-[#0a1f44] text-slate-100 font-sans selection:bg-amber-400 selection:text-amber-900 relative overflow-x-hidden">
       {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-200/30 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-rose-200/30 rounded-full blur-[120px]" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
+        <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-amber-400/15 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-300/15 rounded-full blur-[120px]" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.05]" />
       </div>
 
       {/* Petals */}
@@ -170,10 +203,10 @@ function EnvelopeScreen({ guestName, onOpen }) {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-rose-100 shadow-sm mb-8"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 shadow-sm mb-8"
         >
-          <Sparkles size={14} className="text-rose-500" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500">
+          <Sparkles size={14} className="text-amber-400" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
             Thiệp mời lễ tốt nghiệp
           </span>
         </motion.div>
@@ -182,11 +215,11 @@ function EnvelopeScreen({ guestName, onOpen }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.35 }}
-          className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter leading-[1] mb-4"
+          className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[1] mb-4"
         >
           Bạn có một lời mời
           <br />
-          <span className="bg-gradient-to-r from-rose-500 to-blue-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
             đặc biệt!
           </span>
         </motion.h1>
@@ -195,10 +228,10 @@ function EnvelopeScreen({ guestName, onOpen }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-slate-500 font-medium text-base md:text-lg mb-10"
+          className="text-slate-300 font-medium text-base md:text-lg mb-10"
         >
-          Gửi đến <span className="font-bold text-slate-900">{guestName}</span> — mình trân trọng mời bạn đến chung vui trong ngày lễ tốt nghiệp của{' '}
-          <span className="font-bold text-slate-900">{profile.name}</span>.
+          Gửi đến <span className="font-bold text-amber-300">{guestName}</span> — mình trân trọng mời bạn đến chung vui trong ngày lễ tốt nghiệp của{' '}
+          <span className="font-bold text-white">{profile.name}</span>.
         </motion.p>
 
         {/* Envelope Illustration */}
@@ -208,17 +241,17 @@ function EnvelopeScreen({ guestName, onOpen }) {
           transition={{ duration: 0.7, delay: 0.65 }}
           className="relative mx-auto w-72 h-48 md:w-96 md:h-60 mb-10"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-rose-500 to-rose-600 rounded-3xl shadow-2xl shadow-rose-500/30" />
-          <div className="absolute inset-3 bg-gradient-to-br from-rose-300 to-rose-500 rounded-2xl flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 rounded-3xl shadow-2xl shadow-amber-500/40" />
+          <div className="absolute inset-3 bg-gradient-to-br from-amber-300 to-amber-600 rounded-2xl flex items-center justify-center">
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white flex items-center justify-center shadow-xl"
+              className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#0a1f44] flex items-center justify-center shadow-xl"
             >
-              <Heart size={36} className="text-rose-500 fill-rose-500" />
+              <Heart size={36} className="text-amber-400 fill-amber-400" />
             </motion.div>
           </div>
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-rose-700/80 rounded-t-xl" />
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-amber-700/80 rounded-t-xl" />
         </motion.div>
 
         <motion.button
@@ -228,7 +261,7 @@ function EnvelopeScreen({ guestName, onOpen }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
           onClick={onOpen}
-          className="inline-flex items-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl shadow-slate-900/30 hover:bg-rose-600 transition-colors"
+          className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl shadow-amber-500/30 hover:from-amber-300 hover:to-amber-400 transition-colors"
         >
           <Mail size={18} />
           Mở thiệp mời
@@ -266,9 +299,9 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         transition={{ delay: 0.2 }}
         className="text-center mb-10"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-blue-100 shadow-sm">
-          <Sparkles size={14} className="text-blue-500" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 shadow-sm">
+          <Sparkles size={14} className="text-amber-400" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
             Trân trọng kính mời
           </span>
         </div>
@@ -281,19 +314,19 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         transition={{ delay: 0.35 }}
         className="text-center mb-12"
       >
-        <p className="text-slate-500 font-medium text-base md:text-lg mb-3">
-          Kính gửi <span className="font-bold text-slate-900">{guestName}</span>,
+        <p className="text-slate-300 font-medium text-base md:text-lg mb-3">
+          Kính gửi <span className="font-bold text-amber-300">{guestName}</span>,
         </p>
-        <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] text-slate-900 mb-4">
+        <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] text-white mb-4">
           Lễ Tốt Nghiệp
           <br />
-          <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-500 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
             2026
           </span>
         </h1>
-        <p className="text-slate-500 max-w-xl mx-auto leading-relaxed font-medium">
+        <p className="text-slate-300 max-w-xl mx-auto leading-relaxed font-medium">
           Sau 4 năm ròng rã với bao nỗ lực và cố gắng, hành trình sinh viên của{' '}
-          <span className="font-bold text-slate-900">{profile.name}</span> sắp đi đến đích đầu tiên.
+          <span className="font-bold text-white">{profile.name}</span> sắp đi đến đích đầu tiên.
           Mình thật lòng muốn được chia sẻ khoảnh khắc trọng đại này cùng bạn — người đã luôn đồng hành.
         </p>
       </motion.div>
@@ -305,17 +338,17 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         transition={{ delay: 0.5, duration: 0.6 }}
         className="relative mx-auto w-full max-w-md md:max-w-lg mb-14"
       >
-        <div className="absolute -inset-6 bg-gradient-to-tr from-blue-200 via-indigo-200 to-rose-200 rounded-[3rem] blur-2xl opacity-60" />
-        <div className="relative bg-white p-3 rounded-[2.5rem] shadow-2xl">
-          <div className="aspect-[3/4] rounded-[2rem] overflow-hidden bg-gradient-to-br from-blue-100 to-rose-100">
+        <div className="absolute -inset-6 bg-gradient-to-tr from-amber-400/30 via-blue-500/20 to-amber-400/20 rounded-[3rem] blur-2xl opacity-80" />
+        <div className="relative bg-gradient-to-br from-amber-400/20 to-amber-600/20 p-3 rounded-[2.5rem] shadow-2xl border border-amber-400/30">
+          <div className="aspect-[3/4] rounded-[2rem] overflow-hidden bg-gradient-to-br from-blue-900 to-amber-900/40">
             <img
               src="/avatar.png"
               alt={profile.name}
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-xl">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">Graduate</p>
+          <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] px-6 py-3 rounded-2xl shadow-xl">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a1f44]/70 mb-1">Graduate</p>
             <p className="font-black text-base md:text-lg whitespace-nowrap">{profile.name}</p>
           </div>
         </div>
@@ -332,20 +365,20 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
           icon={<Calendar size={22} />}
           label="Ngày"
           value={EVENT_INFO.dateLabel}
-          accent="from-blue-500 to-indigo-500"
+          accent="from-amber-400 to-amber-600"
         />
         <InfoCard
           icon={<Clock size={22} />}
           label="Thời gian"
           value={EVENT_INFO.timeLabel}
-          accent="from-indigo-500 to-purple-500"
+          accent="from-blue-500 to-indigo-600"
         />
         <InfoCard
           icon={<MapPin size={22} />}
           label="Địa điểm"
           value={EVENT_INFO.venueShort}
           href={EVENT_INFO.mapUrl}
-          accent="from-rose-500 to-pink-500"
+          accent="from-amber-500 to-yellow-600"
         />
       </motion.div>
 
@@ -354,11 +387,11 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.85 }}
-        className="bg-white/80 backdrop-blur-md border border-slate-100 rounded-[2rem] p-6 md:p-8 mb-12 shadow-xl shadow-blue-500/5 text-center"
+        className="bg-gradient-to-br from-blue-900/40 to-blue-950/40 backdrop-blur-md border border-amber-400/20 rounded-[2rem] p-6 md:p-8 mb-12 shadow-2xl shadow-amber-500/10 text-center"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 mb-5">
-          <Gift size={12} className="text-rose-500" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 mb-5">
+          <Gift size={12} className="text-amber-400" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
             Đếm ngược đến ngày vui
           </span>
         </div>
@@ -378,11 +411,11 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.0 }}
-        className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-[2rem] p-8 md:p-10 mb-12 shadow-2xl"
+        className="bg-gradient-to-br from-[#0d2552] to-[#0a1f44] border border-amber-400/20 text-white rounded-[2rem] p-8 md:p-10 mb-12 shadow-2xl"
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-300 mb-2">Địa điểm tổ chức</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400 mb-2">Địa điểm tổ chức</p>
             <h3 className="text-2xl md:text-3xl font-black tracking-tight mb-2">
               {EVENT_INFO.venueFull}
             </h3>
@@ -394,7 +427,7 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
             href={EVENT_INFO.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-blue-50 transition shrink-0 w-fit"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] rounded-xl font-black hover:from-amber-300 hover:to-amber-400 transition shrink-0 w-fit"
           >
             <MapPin size={16} />
             Mở Google Maps
@@ -408,19 +441,19 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.15 }}
-        className="text-center bg-gradient-to-br from-rose-50 via-white to-blue-50 border border-rose-100 rounded-[2rem] p-8 md:p-12 mb-12 shadow-xl"
+        className="text-center bg-gradient-to-br from-amber-400/10 via-blue-900/30 to-amber-400/5 border border-amber-400/30 rounded-[2rem] p-8 md:p-12 mb-12 shadow-2xl"
       >
-        <Heart size={36} className="text-rose-500 fill-rose-500 mx-auto mb-4" />
-        <h2 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 mb-3">
+        <Heart size={36} className="text-amber-400 fill-amber-400 mx-auto mb-4" />
+        <h2 className="text-2xl md:text-4xl font-black tracking-tight text-white mb-3">
           Hẹn gặp bạn ngày 28/8 nhé!
         </h2>
-        <p className="text-slate-500 max-w-xl mx-auto leading-relaxed font-medium mb-8">
+        <p className="text-slate-300 max-w-xl mx-auto leading-relaxed font-medium mb-8">
           Mình rất mong được gặp bạn tại buổi lễ. Nếu có bất cứ điều gì cần hỗ trợ — cứ thoải mái liên hệ với mình qua các kênh dưới đây nhé!
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <a
             href={`mailto:${profile.social.email}`}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-rose-600 transition shadow-xl shadow-slate-900/20"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] rounded-2xl font-black hover:from-amber-300 hover:to-amber-400 transition shadow-xl shadow-amber-500/30"
           >
             <Mail size={18} />
             {profile.social.email}
@@ -429,7 +462,7 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
             href={profile.social.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition shadow-sm"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md border border-amber-400/30 text-white rounded-2xl font-bold hover:bg-white/20 transition"
           >
             <ExternalLink size={18} />
             Ghé Portfolio mình
@@ -442,25 +475,22 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.3 }}
-        className="text-center pt-8 border-t border-slate-200"
+        className="text-center pt-8 border-t border-amber-400/20"
       >
-        <p className="text-slate-500 italic mb-2 font-medium">
+        <p className="text-slate-300 italic mb-2 font-medium">
           "Mỗi hành trình đều đáng trân trọng — nhất là khi có bạn đồng hành."
         </p>
-        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mt-4">
+        <p className="text-amber-400 text-[10px] font-black uppercase tracking-[0.3em] mt-4">
           © 2026 {profile.name.toUpperCase()} • UEF GRADUATE
         </p>
         <button
           onClick={toggleMusic}
-          className="mt-6 inline-flex items-center gap-2 text-xs text-slate-400 hover:text-blue-500 transition"
+          className="mt-6 inline-flex items-center gap-2 text-xs text-slate-400 hover:text-amber-400 transition"
         >
-          {musicPlaying ? <Music2 size={14} /> : <Music size={14} />}
-          {musicPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền (sắp có)'}
+          {musicPlaying ? <VolumeX size={14} /> : <Volume2 size={14} />}
+          {musicPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
         </button>
       </motion.footer>
-
-      {/* Quick switch giữa các khách mời (chỉ hiển thị khi dev) */}
-      {import.meta.env.DEV && <GuestQuickSwitch current={guestName} />}
     </motion.div>
   );
 }
@@ -474,19 +504,19 @@ function InfoCard({ icon, label, value, href, accent }) {
   return (
     <Wrapper
       {...wrapperProps}
-      className="group bg-white/80 backdrop-blur-md border border-slate-100 rounded-2xl p-5 md:p-6 shadow-lg shadow-blue-500/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="group bg-gradient-to-br from-blue-900/40 to-blue-950/40 backdrop-blur-md border border-amber-400/20 rounded-2xl p-5 md:p-6 shadow-lg shadow-amber-500/5 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1 hover:border-amber-400/50 transition-all duration-300"
     >
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${accent} text-white flex items-center justify-center mb-4 shadow-md`}>
+      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${accent} text-[#0a1f44] flex items-center justify-center mb-4 shadow-md`}>
         {icon}
       </div>
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-300/80 mb-1">
         {label}
       </p>
-      <p className="font-black text-slate-900 text-base md:text-lg leading-snug">
+      <p className="font-black text-white text-base md:text-lg leading-snug">
         {value}
       </p>
       {href && (
-        <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-blue-500 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+        <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-amber-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
           Mở bản đồ <ExternalLink size={10} />
         </p>
       )}
@@ -494,32 +524,4 @@ function InfoCard({ icon, label, value, href, accent }) {
   );
 }
 
-/* Hỗ trợ dev: danh sách nút bấm chuyển nhanh giữa các khách mời */
-function GuestQuickSwitch({ current }) {
-  if (typeof window === 'undefined') return null;
-  return (
-    <div className="mt-10 p-4 md:p-6 rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/40">
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 text-center">
-        🛠 Dev tool — chuyển nhanh giữa các khách mời
-      </p>
-      <div className="flex flex-wrap gap-2 justify-center">
-        {inviteUrls.map((guest) => (
-          <a
-            key={guest.slug}
-            href={guest.url + '?open=1'}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold border transition ${
-              current === guest.name
-                ? 'bg-blue-600 text-white border-blue-600 shadow-md'
-                : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400 hover:text-blue-600'
-            }`}
-          >
-            {guest.name}
-          </a>
-        ))}
-      </div>
-      <p className="text-[10px] text-slate-400 mt-3 text-center">
-        Chỉ hiển thị ở chế độ dev (npm run dev) — sẽ không xuất hiện trên bản deploy.
-      </p>
-    </div>
-  );
-}
+/* ---------------- END ---------------- */

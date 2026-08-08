@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Github, Linkedin, Mail, Code2, Headphones, FileText, X, Camera, Layout, ChevronRight, Images, ChevronLeft, Quote, ExternalLink, RefreshCw, Wifi, Eye, Maximize2 } from 'lucide-react';
 import { profile, projects, events, techStack, timeline } from './data';
 import Invitation from './pages/Invitation';
+import { guestList } from './guests';
 
 /* ---------- Hash Router đơn giản cho /thiepmoi/:name ---------- */
 function useHashRoute() {
@@ -18,13 +19,18 @@ function useHashRoute() {
 }
 
 function parseInvitationRoute(hash) {
-  // Hỗ trợ: #/thiepmoi/Tên người
+  // Hỗ trợ: #/thiepmoi/<slug>
   const match = hash.match(/^#\/thiepmoi\/(.+)$/);
   if (!match) return null;
   const raw = decodeURIComponent(match[1]);
   // Bỏ query string nếu có (?open=1)
-  const name = raw.split('?')[0];
-  return { name };
+  const slug = raw.split('?')[0].trim();
+
+  // Map slug → name (tên có dấu) từ guestList
+  const found = guestList.find((g) => g.slug.toLowerCase() === slug.toLowerCase());
+  const displayName = found ? found.name : slug;
+
+  return { name: displayName, slug };
 }
 
 const containerVariants = {

@@ -460,7 +460,7 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
       </motion.footer>
 
       {/* Quick switch giữa các khách mời (chỉ hiển thị khi dev) */}
-      {import.meta.env.DEV && <GuestQuickSwitch current={formattedGuestName} />}
+      {import.meta.env.DEV && <GuestQuickSwitch current={guestName} />}
     </motion.div>
   );
 }

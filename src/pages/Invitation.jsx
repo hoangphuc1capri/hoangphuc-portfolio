@@ -23,7 +23,6 @@ const EVENT_INFO = {
   venueShort: 'Nhà Hát Hòa Bình TP.HCM',
   venueFull: 'Nhà Hát Hòa Bình TP.HCM',
   venueAddress: 'Số 240 đường 3 Tháng 2, Phường 12, Quận 10, TP.HCM',
-  rsvpFormUrl: 'https://forms.gle/your-google-form-id',
   mapUrl: 'https://maps.google.com/?q=Nh%C3%A0+h%C3%A1t+H%C3%B2a+B%C3%ACnh+TP+HCM',
 };
 
@@ -404,7 +403,7 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         </div>
       </motion.div>
 
-      {/* RSVP */}
+      {/* Liên hệ */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -413,28 +412,27 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
       >
         <Heart size={36} className="text-rose-500 fill-rose-500 mx-auto mb-4" />
         <h2 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 mb-3">
-          Bạn sẽ đến chứ?
+          Hẹn gặp bạn ngày 28/8 nhé!
         </h2>
         <p className="text-slate-500 max-w-xl mx-auto leading-relaxed font-medium mb-8">
-          Mình rất mong được gặp bạn tại buổi lễ. Hãy xác nhận tham dự để mình sắp xếp đón tiếp chu đáo nhất nhé!
+          Mình rất mong được gặp bạn tại buổi lễ. Nếu có bất cứ điều gì cần hỗ trợ — cứ thoải mái liên hệ với mình qua các kênh dưới đây nhé!
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <a
-            href={EVENT_INFO.rsvpFormUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`mailto:${profile.social.email}`}
             className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-rose-600 transition shadow-xl shadow-slate-900/20"
           >
             <Mail size={18} />
-            Xác nhận tham dự
-            <ExternalLink size={14} />
+            {profile.social.email}
           </a>
           <a
-            href={`mailto:${profile.social.email}`}
+            href={profile.social.github}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition shadow-sm"
           >
-            <Mail size={18} />
-            Gửi email cho mình
+            <ExternalLink size={18} />
+            Ghé Portfolio mình
           </a>
         </div>
       </motion.div>

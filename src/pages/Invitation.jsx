@@ -23,6 +23,17 @@ const EVENT_INFO = {
   mapUrl: 'https://maps.google.com/?q=Nh%C3%A0+h%C3%A1t+H%C3%B2a+B%C3%ACnh+TP+HCM',
 };
 
+// 🎨 Flat UI 2.0 — bảng màu
+const COLORS = {
+  bg: '#0a1f44',           // navy đậm phẳng
+  surface: '#102a5e',      // surface (không blur, không opacity)
+  surfaceAlt: '#1a3a7a',   // surface phụ
+  border: '#f59e0b',       // amber border
+  accent: '#f59e0b',       // amber
+  text: '#ffffff',
+  textMuted: '#94a3b8',
+};
+
 function useCountdown(targetDate) {
   const target = useMemo(() => new Date(targetDate).getTime(), [targetDate]);
   const [now, setNow] = useState(() => Date.now());
@@ -43,11 +54,23 @@ function useCountdown(targetDate) {
 
 function CountdownBlock({ value, label }) {
   return (
-    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/60 to-blue-950/60 backdrop-blur-md border border-amber-400/20 rounded-2xl px-3 py-4 md:px-5 md:py-5 min-w-[70px] md:min-w-[90px] shadow-lg shadow-amber-500/10">
-      <span className="text-2xl md:text-4xl font-black tracking-tighter text-amber-400 tabular-nums">
+    <div
+      className="flex flex-col items-center justify-center rounded-xl px-4 py-3 md:px-6 md:py-4 min-w-[80px] md:min-w-[100px]"
+      style={{
+        backgroundColor: COLORS.surface,
+        border: `2px solid ${COLORS.accent}`,
+      }}
+    >
+      <span
+        className="text-3xl md:text-5xl font-black tabular-nums leading-none"
+        style={{ color: COLORS.accent }}
+      >
         {String(value).padStart(2, '0')}
       </span>
-      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-amber-300/80 mt-1">
+      <span
+        className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] mt-2"
+        style={{ color: COLORS.accent }}
+      >
         {label}
       </span>
     </div>
@@ -71,14 +94,8 @@ function FloatingPetal({ delay, duration, left, size }) {
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
         <path
           d="M12 2C8 6 6 10 6 14a6 6 0 0012 0c0-4-2-8-6-12z"
-          fill="url(#petal-gradient)"
+          fill="#f59e0b"
         />
-        <defs>
-          <linearGradient id="petal-gradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#fcd34d" />
-            <stop offset="100%" stopColor="#f59e0b" />
-          </linearGradient>
-        </defs>
       </svg>
     </motion.div>
   );
@@ -112,23 +129,19 @@ export default function Invitation({ guestName = 'Quý khách' }) {
   }, [formattedGuestName]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f44] via-[#0d2552] to-[#0a1f44] text-slate-100 font-sans selection:bg-amber-400 selection:text-amber-900 relative overflow-x-hidden">
-      {/* Background Decor */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-amber-400/15 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-300/15 rounded-full blur-[120px]" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.05]" />
-      </div>
-
+    <div
+      className="min-h-screen text-white font-sans relative overflow-x-hidden"
+      style={{ backgroundColor: COLORS.bg, color: COLORS.text }}
+    >
       {/* Petals */}
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
-        {Array.from({ length: 12 }).map((_, i) => (
+        {Array.from({ length: 10 }).map((_, i) => (
           <FloatingPetal
             key={i}
             delay={i * 1.5}
             duration={14 + (i % 4) * 2}
-            left={(i * 8.5) % 100}
-            size={20 + (i % 3) * 6}
+            left={(i * 10) % 100}
+            size={18 + (i % 3) * 6}
           />
         ))}
       </div>
@@ -164,10 +177,18 @@ function EnvelopeScreen({ guestName, onOpen }) {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 shadow-sm mb-8"
+          className="inline-flex items-center gap-2 px-4 py-2 mb-8"
+          style={{
+            backgroundColor: COLORS.surface,
+            border: `2px solid ${COLORS.accent}`,
+            borderRadius: '999px',
+          }}
         >
-          <Sparkles size={14} className="text-amber-400" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
+          <Sparkles size={14} style={{ color: COLORS.accent }} />
+          <span
+            className="text-[10px] font-black uppercase tracking-[0.3em]"
+            style={{ color: COLORS.accent }}
+          >
             Thiệp mời lễ tốt nghiệp
           </span>
         </motion.div>
@@ -176,23 +197,30 @@ function EnvelopeScreen({ guestName, onOpen }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.35 }}
-          className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[1] mb-4"
+          className="text-4xl md:text-6xl font-black tracking-tighter leading-[1] mb-6"
+          style={{ color: COLORS.text }}
         >
           Bạn có một lời mời
           <br />
-          <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-            đặc biệt!
-          </span>
+          <span style={{ color: COLORS.accent }}>đặc biệt!</span>
         </motion.h1>
 
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-slate-300 font-medium text-base md:text-lg mb-10"
+          className="font-medium text-base md:text-lg mb-12"
+          style={{ color: COLORS.textMuted }}
         >
-          Gửi đến <span className="font-bold text-amber-300">{guestName}</span> — mình trân trọng mời bạn đến chung vui trong ngày lễ tốt nghiệp của{' '}
-          <span className="font-bold text-white">{profile.name}</span>.
+          Gửi đến{' '}
+          <span className="font-bold" style={{ color: COLORS.accent }}>
+            {guestName}
+          </span>{' '}
+          — mình trân trọng mời bạn đến chung vui trong ngày lễ tốt nghiệp của{' '}
+          <span className="font-bold" style={{ color: COLORS.text }}>
+            {profile.name}
+          </span>
+          .
         </motion.p>
 
         {/* Envelope Illustration */}
@@ -200,29 +228,48 @@ function EnvelopeScreen({ guestName, onOpen }) {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.65 }}
-          className="relative mx-auto w-72 h-48 md:w-96 md:h-60 mb-10"
+          className="relative mx-auto w-72 h-48 md:w-96 md:h-60 mb-12"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 rounded-3xl shadow-2xl shadow-amber-500/40" />
-          <div className="absolute inset-3 bg-gradient-to-br from-amber-300 to-amber-600 rounded-2xl flex items-center justify-center">
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#0a1f44] flex items-center justify-center shadow-xl"
+          {/* Phong bì ngoài (flat, solid color) */}
+          <div
+            className="absolute inset-0 rounded-2xl"
+            style={{
+              backgroundColor: COLORS.accent,
+              border: `4px solid ${COLORS.accent}`,
+            }}
+          />
+          {/* Ruột phong bì */}
+          <div
+            className="absolute inset-2 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: '#fbbf24' }}
+          >
+            <div
+              className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: COLORS.bg }}
             >
-              <Heart size={36} className="text-amber-400 fill-amber-400" />
-            </motion.div>
+              <Heart size={36} style={{ color: COLORS.accent, fill: COLORS.accent }} />
+            </div>
           </div>
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-amber-700/80 rounded-t-xl" />
+          {/* Nắp phong bì (flat top) */}
+          <div
+            className="absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-8 rounded-t-lg"
+            style={{ backgroundColor: '#d97706' }}
+          />
         </motion.div>
 
         <motion.button
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.85 }}
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
           onClick={onOpen}
-          className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl shadow-amber-500/30 hover:from-amber-300 hover:to-amber-400 transition-colors"
+          className="inline-flex items-center gap-3 px-10 py-5 rounded-xl font-black uppercase tracking-widest text-sm"
+          style={{
+            backgroundColor: COLORS.accent,
+            color: COLORS.bg,
+            border: `2px solid ${COLORS.accent}`,
+          }}
         >
           <Mail size={18} />
           Mở thiệp mời
@@ -232,7 +279,8 @@ function EnvelopeScreen({ guestName, onOpen }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="mt-10 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center justify-center gap-2"
+          className="mt-10 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-2"
+          style={{ color: COLORS.textMuted }}
         >
           <ChevronDown size={14} className="animate-bounce" />
           Nhấn để mở thiệp
@@ -260,10 +308,19 @@ function InvitationScreen({ guestName, countdown }) {
         transition={{ delay: 0.2 }}
         className="text-center mb-10"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 shadow-sm">
-          <Sparkles size={14} className="text-amber-400" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
-            Trân trọng kính mời
+        <div
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+          style={{
+            backgroundColor: COLORS.surface,
+            border: `2px solid ${COLORS.accent}`,
+          }}
+        >
+          <Sparkles size={14} style={{ color: COLORS.accent }} />
+          <span
+            className="text-[10px] font-black uppercase tracking-[0.3em]"
+            style={{ color: COLORS.accent }}
+          >
+            Trân trọng
           </span>
         </div>
       </motion.div>
@@ -275,20 +332,34 @@ function InvitationScreen({ guestName, countdown }) {
         transition={{ delay: 0.35 }}
         className="text-center mb-12"
       >
-        <p className="text-slate-300 font-medium text-base md:text-lg mb-3">
-          Kính gửi <span className="font-bold text-amber-300">{guestName}</span>,
+        <p
+          className="font-medium text-base md:text-lg mb-4"
+          style={{ color: COLORS.textMuted }}
+        >
+          Thân mời{' '}
+          <span className="font-bold" style={{ color: COLORS.accent }}>
+            {guestName}
+          </span>
+          ,
         </p>
-        <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] text-white mb-4">
+        <h1
+          className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] mb-6"
+          style={{ color: COLORS.text }}
+        >
           Lễ Tốt Nghiệp
           <br />
-          <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-            2026
-          </span>
+          <span style={{ color: COLORS.accent }}>2026</span>
         </h1>
-        <p className="text-slate-300 max-w-xl mx-auto leading-relaxed font-medium">
+        <p
+          className="max-w-xl mx-auto leading-relaxed font-medium"
+          style={{ color: COLORS.textMuted }}
+        >
           Sau 4 năm ròng rã với bao nỗ lực và cố gắng, hành trình sinh viên của{' '}
-          <span className="font-bold text-white">{profile.name}</span> sắp đi đến đích đầu tiên.
-          Mình thật lòng muốn được chia sẻ khoảnh khắc trọng đại này cùng bạn — người đã luôn đồng hành.
+          <span className="font-bold" style={{ color: COLORS.text }}>
+            {profile.name}
+          </span>{' '}
+          sắp đi đến đích đầu tiên. Mình thật lòng muốn được chia sẻ khoảnh khắc trọng đại
+          này cùng bạn — người đã luôn đồng hành.
         </p>
       </motion.div>
 
@@ -299,18 +370,44 @@ function InvitationScreen({ guestName, countdown }) {
         transition={{ delay: 0.5, duration: 0.6 }}
         className="relative mx-auto w-full max-w-md md:max-w-lg mb-14"
       >
-        <div className="absolute -inset-6 bg-gradient-to-tr from-amber-400/30 via-blue-500/20 to-amber-400/20 rounded-[3rem] blur-2xl opacity-80" />
-        <div className="relative bg-gradient-to-br from-amber-400/20 to-amber-600/20 p-3 rounded-[2.5rem] shadow-2xl border border-amber-400/30">
-          <div className="aspect-[3/4] rounded-[2rem] overflow-hidden bg-gradient-to-br from-blue-900 to-amber-900/40">
+        {/* Khung flat (không glow, không blur) */}
+        <div
+          className="relative p-3 rounded-2xl"
+          style={{
+            backgroundColor: COLORS.surface,
+            border: `3px solid ${COLORS.accent}`,
+          }}
+        >
+          <div
+            className="aspect-[3/4] rounded-xl overflow-hidden"
+            style={{ backgroundColor: COLORS.surfaceAlt }}
+          >
             <img
               src="/avatar.png"
               alt={profile.name}
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] px-6 py-3 rounded-2xl shadow-xl">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a1f44]/70 mb-1">Graduate</p>
-            <p className="font-black text-base md:text-lg whitespace-nowrap">{profile.name}</p>
+          {/* Tag Graduate */}
+          <div
+            className="absolute -bottom-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl"
+            style={{
+              backgroundColor: COLORS.accent,
+              border: `3px solid ${COLORS.accent}`,
+            }}
+          >
+            <p
+              className="text-[10px] font-black uppercase tracking-[0.3em] mb-1"
+              style={{ color: COLORS.bg }}
+            >
+              Graduate
+            </p>
+            <p
+              className="font-black text-base md:text-lg whitespace-nowrap"
+              style={{ color: COLORS.bg }}
+            >
+              {profile.name}
+            </p>
           </div>
         </div>
       </motion.div>
@@ -320,26 +417,26 @@ function InvitationScreen({ guestName, countdown }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12"
+        className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-12"
       >
         <InfoCard
           icon={<Calendar size={22} />}
           label="Ngày"
           value={EVENT_INFO.dateLabel}
-          accent="from-amber-400 to-amber-600"
+          iconBg="#f59e0b"
         />
         <InfoCard
           icon={<Clock size={22} />}
           label="Thời gian"
           value={EVENT_INFO.timeLabel}
-          accent="from-blue-500 to-indigo-600"
+          iconBg="#fbbf24"
         />
         <InfoCard
           icon={<MapPin size={22} />}
           label="Địa điểm"
           value={EVENT_INFO.venueShort}
           href={EVENT_INFO.mapUrl}
-          accent="from-amber-500 to-yellow-600"
+          iconBg="#d97706"
         />
       </motion.div>
 
@@ -348,11 +445,24 @@ function InvitationScreen({ guestName, countdown }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.85 }}
-        className="bg-gradient-to-br from-blue-900/40 to-blue-950/40 backdrop-blur-md border border-amber-400/20 rounded-[2rem] p-6 md:p-8 mb-12 shadow-2xl shadow-amber-500/10 text-center"
+        className="rounded-2xl p-6 md:p-8 mb-12 text-center"
+        style={{
+          backgroundColor: COLORS.surface,
+          border: `2px solid ${COLORS.accent}`,
+        }}
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 mb-5">
-          <Gift size={12} className="text-amber-400" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
+        <div
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6"
+          style={{
+            backgroundColor: COLORS.bg,
+            border: `2px solid ${COLORS.accent}`,
+          }}
+        >
+          <Gift size={12} style={{ color: COLORS.accent }} />
+          <span
+            className="text-[10px] font-black uppercase tracking-[0.3em]"
+            style={{ color: COLORS.accent }}
+          >
             Đếm ngược đến ngày vui
           </span>
         </div>
@@ -362,8 +472,13 @@ function InvitationScreen({ guestName, countdown }) {
           <CountdownBlock value={countdown.minutes} label="Phút" />
           <CountdownBlock value={countdown.seconds} label="Giây" />
         </div>
-        <p className="mt-5 text-xs md:text-sm text-slate-400 font-medium">
-          {countdown.finished ? 'Đã đến ngày vui! Hẹn gặp bạn tại lễ tốt nghiệp.' : 'Sự kiện sẽ diễn ra trong ít ngày nữa — hẹn gặp bạn!'}
+        <p
+          className="mt-6 text-xs md:text-sm font-medium"
+          style={{ color: COLORS.textMuted }}
+        >
+          {countdown.finished
+            ? 'Đã đến ngày vui! Hẹn gặp bạn tại lễ tốt nghiệp.'
+            : 'Sự kiện sẽ diễn ra trong ít ngày nữa — hẹn gặp bạn!'}
         </p>
       </motion.div>
 
@@ -372,15 +487,28 @@ function InvitationScreen({ guestName, countdown }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.0 }}
-        className="bg-gradient-to-br from-[#0d2552] to-[#0a1f44] border border-amber-400/20 text-white rounded-[2rem] p-8 md:p-10 mb-12 shadow-2xl"
+        className="rounded-2xl p-8 md:p-10 mb-12"
+        style={{
+          backgroundColor: COLORS.surface,
+          border: `2px solid ${COLORS.accent}`,
+          color: COLORS.text,
+        }}
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400 mb-2">Địa điểm tổ chức</p>
+            <p
+              className="text-[10px] font-black uppercase tracking-[0.3em] mb-2"
+              style={{ color: COLORS.accent }}
+            >
+              Địa điểm tổ chức
+            </p>
             <h3 className="text-2xl md:text-3xl font-black tracking-tight mb-2">
               {EVENT_INFO.venueFull}
             </h3>
-            <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+            <p
+              className="text-sm md:text-base leading-relaxed"
+              style={{ color: COLORS.textMuted }}
+            >
               {EVENT_INFO.venueAddress}
             </p>
           </div>
@@ -388,7 +516,12 @@ function InvitationScreen({ guestName, countdown }) {
             href={EVENT_INFO.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] rounded-xl font-black hover:from-amber-300 hover:to-amber-400 transition shrink-0 w-fit"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-black"
+            style={{
+              backgroundColor: COLORS.accent,
+              color: COLORS.bg,
+              border: `2px solid ${COLORS.accent}`,
+            }}
           >
             <MapPin size={16} />
             Mở Google Maps
@@ -402,19 +535,35 @@ function InvitationScreen({ guestName, countdown }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.15 }}
-        className="text-center bg-gradient-to-br from-amber-400/10 via-blue-900/30 to-amber-400/5 border border-amber-400/30 rounded-[2rem] p-8 md:p-12 mb-12 shadow-2xl"
+        className="text-center rounded-2xl p-8 md:p-12 mb-12"
+        style={{
+          backgroundColor: COLORS.surface,
+          border: `2px solid ${COLORS.accent}`,
+        }}
       >
-        <Heart size={36} className="text-amber-400 fill-amber-400 mx-auto mb-4" />
-        <h2 className="text-2xl md:text-4xl font-black tracking-tight text-white mb-3">
+        <Heart size={40} style={{ color: COLORS.accent, fill: COLORS.accent }} className="mx-auto mb-5" />
+        <h2
+          className="text-2xl md:text-4xl font-black tracking-tight mb-3"
+          style={{ color: COLORS.text }}
+        >
           Hẹn gặp bạn ngày 28/8 nhé!
         </h2>
-        <p className="text-slate-300 max-w-xl mx-auto leading-relaxed font-medium mb-8">
-          Mình rất mong được gặp bạn tại buổi lễ. Nếu có bất cứ điều gì cần hỗ trợ — cứ thoải mái liên hệ với mình qua các kênh dưới đây nhé!
+        <p
+          className="max-w-xl mx-auto leading-relaxed font-medium mb-8"
+          style={{ color: COLORS.textMuted }}
+        >
+          Mình rất mong được gặp bạn tại buổi lễ. Nếu có bất cứ điều gì cần hỗ trợ — cứ thoải mái
+          liên hệ với mình qua các kênh dưới đây nhé!
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <a
             href={`mailto:${profile.social.email}`}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1f44] rounded-2xl font-black hover:from-amber-300 hover:to-amber-400 transition shadow-xl shadow-amber-500/30"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-black"
+            style={{
+              backgroundColor: COLORS.accent,
+              color: COLORS.bg,
+              border: `2px solid ${COLORS.accent}`,
+            }}
           >
             <Mail size={18} />
             {profile.social.email}
@@ -423,7 +572,12 @@ function InvitationScreen({ guestName, countdown }) {
             href={profile.social.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md border border-amber-400/30 text-white rounded-2xl font-bold hover:bg-white/20 transition"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold"
+            style={{
+              backgroundColor: COLORS.bg,
+              color: COLORS.text,
+              border: `2px solid ${COLORS.accent}`,
+            }}
           >
             <ExternalLink size={18} />
             Ghé Portfolio mình
@@ -436,12 +590,19 @@ function InvitationScreen({ guestName, countdown }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.3 }}
-        className="text-center pt-8 border-t border-amber-400/20"
+        className="text-center pt-8"
+        style={{ borderTop: `2px solid ${COLORS.accent}` }}
       >
-        <p className="text-slate-300 italic mb-2 font-medium">
+        <p
+          className="italic mb-2 font-medium"
+          style={{ color: COLORS.textMuted }}
+        >
           "Mỗi hành trình đều đáng trân trọng — nhất là khi có bạn đồng hành."
         </p>
-        <p className="text-amber-400 text-[10px] font-black uppercase tracking-[0.3em] mt-4">
+        <p
+          className="text-[10px] font-black uppercase tracking-[0.3em] mt-4"
+          style={{ color: COLORS.accent }}
+        >
           © 2026 {profile.name.toUpperCase()} • UEF GRADUATE
         </p>
       </motion.footer>
@@ -449,7 +610,7 @@ function InvitationScreen({ guestName, countdown }) {
   );
 }
 
-function InfoCard({ icon, label, value, href, accent }) {
+function InfoCard({ icon, label, value, href, iconBg }) {
   const Wrapper = href ? 'a' : 'div';
   const wrapperProps = href
     ? { href, target: '_blank', rel: 'noopener noreferrer' }
@@ -458,19 +619,35 @@ function InfoCard({ icon, label, value, href, accent }) {
   return (
     <Wrapper
       {...wrapperProps}
-      className="group bg-gradient-to-br from-blue-900/40 to-blue-950/40 backdrop-blur-md border border-amber-400/20 rounded-2xl p-5 md:p-6 shadow-lg shadow-amber-500/5 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1 hover:border-amber-400/50 transition-all duration-300"
+      className="group block rounded-xl p-5 md:p-6"
+      style={{
+        backgroundColor: COLORS.surface,
+        border: `2px solid ${COLORS.accent}`,
+      }}
     >
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${accent} text-[#0a1f44] flex items-center justify-center mb-4 shadow-md`}>
+      <div
+        className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+        style={{ backgroundColor: iconBg, color: COLORS.bg }}
+      >
         {icon}
       </div>
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-300/80 mb-1">
+      <p
+        className="text-[10px] font-black uppercase tracking-[0.3em] mb-1"
+        style={{ color: COLORS.accent }}
+      >
         {label}
       </p>
-      <p className="font-black text-white text-base md:text-lg leading-snug">
+      <p
+        className="font-black text-base md:text-lg leading-snug"
+        style={{ color: COLORS.text }}
+      >
         {value}
       </p>
       {href && (
-        <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-amber-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+        <p
+          className="mt-3 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1"
+          style={{ color: COLORS.accent }}
+        >
           Mở bản đồ <ExternalLink size={10} />
         </p>
       )}

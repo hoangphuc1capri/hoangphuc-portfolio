@@ -5,9 +5,21 @@ import { profile, projects, events, techStack, timeline } from './data';
 import Invitation from './pages/Invitation';
 import { guestList } from './guests';
 
-/* ---------- Hash Router đơn giản cho /thiepmoi/:name ---------- */
+/* ---------- Router: hỗ trợ cả /thiepmoi/<slug> (path) và #/thiepmoi/<slug> (hash) ---------- */
 function useHashRoute() {
-  const [hash, setHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
+  const [hash, setHash] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    // Nếu truy cập dạng path /thiepmoi/<slug> → đổi sang hash để SPA hoạt động
+    const pathMatch = window.location.pathname.match(/^\/thiepmoi\/(.+?)\/?$/);
+    if (pathMatch) {
+      const slug = pathMatch[1];
+      const qs = window.location.search || '';
+      const newUrl = `${window.location.origin}/${qs}#/thiepmoi/${slug}`;
+      window.history.replaceState(null, '', newUrl);
+      return `#/thiepmoi/${slug}`;
+    }
+    return window.location.hash;
+  });
 
   useEffect(() => {
     const onChange = () => setHash(window.location.hash);

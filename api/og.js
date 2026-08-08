@@ -1,8 +1,17 @@
 // Dynamic OG Image endpoint
 // Gọi: /api/og?slug=AnhXuan hoặc /api/og?name=Ánh Xuân
-// Trả về PNG 1200x630 với tên khách được render vào
+// Trả về SVG 1200x630 với tên khách được render vào
 
-import { guestList } from '../src/guests.js';
+const guestList = [
+  { name: 'Quốc Huỳnh', slug: 'QuocHuynh' },
+  { name: 'Ánh Xuân', slug: 'AnhXuan' },
+  { name: 'Thanh Trúc', slug: 'ThanhTruc' },
+  { name: 'Chị Quế Lâm', slug: 'ChiQueLam' },
+];
+
+export const config = {
+  runtime: 'edge',
+};
 
 const COLORS = {
   bg: '#0a1f44',
@@ -11,10 +20,6 @@ const COLORS = {
   accentLight: '#fbbf24',
   text: '#ffffff',
   textMuted: '#cbd5e1',
-};
-
-export const config = {
-  runtime: 'edge',
 };
 
 // Helper: escape XML

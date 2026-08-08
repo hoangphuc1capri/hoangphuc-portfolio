@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
@@ -10,15 +10,8 @@ import {
   ChevronDown,
   Mail,
   ExternalLink,
-  VolumeX,
-  Volume2,
 } from 'lucide-react';
 import { profile } from '../data';
-
-// ⬇️ Đặt file nhạc nền vào thư mục `public/` của project.
-// Gợi ý nhạc: piano không lời, ballad nhẹ nhàng (Canon in D, A Thousand Years, River Flows in You...).
-// Ví dụ đặt file: public/bgm.mp3 — code sẽ tự load.
-const BGM_URL = '/bgm.mp3';
 
 const EVENT_INFO = {
   date: '2026-08-28T15:00:00+07:00',
@@ -94,8 +87,6 @@ function FloatingPetal({ delay, duration, left, size }) {
 export default function Invitation({ guestName = 'Quý khách' }) {
   const countdown = useCountdown(EVENT_INFO.date);
   const [opened, setOpened] = useState(false);
-  const [musicPlaying, setMusicPlaying] = useState(false);
-  const audioRef = useRef(null);
 
   // Khi URL có query ?open=1 thì auto mở thiệp (tiện cho việc preview / share)
   useEffect(() => {
@@ -103,34 +94,6 @@ export default function Invitation({ guestName = 'Quý khách' }) {
     const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
     if (params.get('open') === '1') setOpened(true);
   }, []);
-
-  // Setup audio element
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const audio = new Audio(BGM_URL);
-    audio.loop = true;
-    audio.volume = 0.35; // nhạc nền nhẹ nhàng
-    audioRef.current = audio;
-    return () => {
-      audio.pause();
-      audio.src = '';
-    };
-  }, []);
-
-  // Đồng bộ state ↔ audio play/pause
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (musicPlaying) {
-      audio.play().catch((err) => {
-        // Trình duyệt chặn autoplay → reset state
-        console.warn('Audio play blocked:', err);
-        setMusicPlaying(false);
-      });
-    } else {
-      audio.pause();
-    }
-  }, [musicPlaying]);
 
   const formattedGuestName = useMemo(() => {
     const trimmed = (guestName || '').trim();
@@ -178,8 +141,6 @@ export default function Invitation({ guestName = 'Quý khách' }) {
             key="invitation"
             guestName={formattedGuestName}
             countdown={countdown}
-            musicPlaying={musicPlaying}
-            toggleMusic={() => setMusicPlaying((v) => !v)}
           />
         )}
       </AnimatePresence>
@@ -283,7 +244,7 @@ function EnvelopeScreen({ guestName, onOpen }) {
 
 /* ---------------- INVITATION SCREEN ---------------- */
 
-function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
+function InvitationScreen({ guestName, countdown }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -483,13 +444,6 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
         <p className="text-amber-400 text-[10px] font-black uppercase tracking-[0.3em] mt-4">
           © 2026 {profile.name.toUpperCase()} • UEF GRADUATE
         </p>
-        <button
-          onClick={toggleMusic}
-          className="mt-6 inline-flex items-center gap-2 text-xs text-slate-400 hover:text-amber-400 transition"
-        >
-          {musicPlaying ? <VolumeX size={14} /> : <Volume2 size={14} />}
-          {musicPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
-        </button>
       </motion.footer>
     </motion.div>
   );

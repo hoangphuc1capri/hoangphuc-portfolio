@@ -2,6 +2,30 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, Linkedin, Mail, Code2, Headphones, FileText, X, Camera, Layout, ChevronRight, Images, ChevronLeft, Quote, ExternalLink, RefreshCw, Wifi, Eye, Maximize2 } from 'lucide-react';
 import { profile, projects, events, techStack, timeline } from './data';
+import Invitation from './pages/Invitation';
+
+/* ---------- Hash Router đơn giản cho /thiepmoi/:name ---------- */
+function useHashRoute() {
+  const [hash, setHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
+
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+
+  return hash;
+}
+
+function parseInvitationRoute(hash) {
+  // Hỗ trợ: #/thiepmoi/Tên người
+  const match = hash.match(/^#\/thiepmoi\/(.+)$/);
+  if (!match) return null;
+  const raw = decodeURIComponent(match[1]);
+  // Bỏ query string nếu có (?open=1)
+  const name = raw.split('?')[0];
+  return { name };
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -188,6 +212,9 @@ function LivePreview({ url, title }) {
 
 function App() {
   const [activeView, setActiveView] = useState('developer');
+  const hash = useHashRoute();
+  const inviteRoute = parseInvitationRoute(hash);
+  const isInvitation = !!inviteRoute;
 
   // State mới cho Event Gallery Modal
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -201,6 +228,11 @@ function App() {
     e.stopPropagation();
     setActiveImageIndex((prev) => (prev === 0 ? selectedEvent.images.length - 1 : prev - 1));
   };
+
+  // Nếu đang ở trang thiệp mời → render component thiệp, không render portfolio
+  if (isInvitation) {
+    return <Invitation guestName={inviteRoute.name} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-600 overflow-x-hidden">

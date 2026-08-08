@@ -14,6 +14,7 @@ import {
   Music2
 } from 'lucide-react';
 import { profile } from '../data';
+import { inviteUrls } from '../guests';
 
 const EVENT_INFO = {
   date: '2026-08-28T15:00:00+07:00',
@@ -459,6 +460,9 @@ function InvitationScreen({ guestName, countdown, musicPlaying, toggleMusic }) {
           {musicPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền (sắp có)'}
         </button>
       </motion.footer>
+
+      {/* Quick switch giữa các khách mời (chỉ hiển thị khi dev) */}
+      {import.meta.env.DEV && <GuestQuickSwitch current={formattedGuestName} />}
     </motion.div>
   );
 }
@@ -489,5 +493,35 @@ function InfoCard({ icon, label, value, href, accent }) {
         </p>
       )}
     </Wrapper>
+  );
+}
+
+/* Hỗ trợ dev: danh sách nút bấm chuyển nhanh giữa các khách mời */
+function GuestQuickSwitch({ current }) {
+  if (typeof window === 'undefined') return null;
+  return (
+    <div className="mt-10 p-4 md:p-6 rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/40">
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 text-center">
+        🛠 Dev tool — chuyển nhanh giữa các khách mời
+      </p>
+      <div className="flex flex-wrap gap-2 justify-center">
+        {inviteUrls.map((guest) => (
+          <a
+            key={guest.slug}
+            href={guest.url + '?open=1'}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold border transition ${
+              current === guest.name
+                ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400 hover:text-blue-600'
+            }`}
+          >
+            {guest.name}
+          </a>
+        ))}
+      </div>
+      <p className="text-[10px] text-slate-400 mt-3 text-center">
+        Chỉ hiển thị ở chế độ dev (npm run dev) — sẽ không xuất hiện trên bản deploy.
+      </p>
+    </div>
   );
 }

@@ -7,6 +7,9 @@ const guestList = [
   { name: 'Ánh Xuân', slug: 'AnhXuan' },
   { name: 'Thanh Trúc', slug: 'ThanhTruc' },
   { name: 'Chị Quế Lâm', slug: 'ChiQueLam' },
+  { name: 'Chị Tường Vy', slug: 'TuongVy' },
+  { name: 'Chị Ngọc Yên', slug: 'NgocYen' },
+  { name: 'Hương Giang', slug: 'HuongGiang' },
 ];
 
 export const config = {

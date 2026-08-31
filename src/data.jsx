@@ -2,23 +2,41 @@ import { Globe, Smartphone, Book, Award, Code2, Database, Terminal } from 'lucid
 
 export const profile = {
   name: "Nguyễn Hoàng Phúc",
-  role: "Software Developer @ Digiso",
-  bio: "Lập trình viên chính thức tại Công ty TNHH Giải pháp số Digiso. Tốt nghiệp chuyên ngành Công nghệ Phần mềm tại UEF với tư duy giải quyết vấn đề dựa trên thực tiễn, tập trung xây dựng các sản phẩm số hữu ích, hiện đại và có thể triển khai thực tế.",
+  role: "Software Developer",
+  bio: "Tốt nghiệp Công nghệ Phần mềm — UEF. Đam mê biến ý tưởng thành sản phẩm thật, từ web fullstack đến landing page marketing chuyển đổi cao. Hoàn thành 3 tháng thực tập tại Digiso, phát triển dự án FounderAI.biz. Bên cạnh code, vận hành kỹ thuật sự kiện (AV, LED, livestream) — rèn tư duy xử lý sự cố real-time dưới áp lực.",
   university: "Đại học Kinh tế - Tài chính TP.HCM (UEF)",
   major: "Công nghệ Phần mềm",
   birthYear: "2004",
-  currentRole: {
-    title: "Lập trình viên",
-    company: "Công ty TNHH Giải pháp số Digiso",
-    type: "Nhân viên chính thức",
-    startDate: "01/08/2026"
-  },
   internship: {
     title: "Thực tập sinh Lập trình viên",
     company: "Công ty TNHH Giải pháp số Digiso",
     duration: "20/04/2026 - 20/07/2026",
     months: "3 tháng",
     note: "Trong thời gian thực tập, đã phát triển dự án FounderAI.biz cùng team."
+  },
+  uefExperience: {
+    title: "Trưởng ban Kỹ thuật & Dev CSLUEF.com",
+    company: "Trung tâm Kết nối cộng đồng — UEF",
+    duration: "09/2022 — 04/2026",
+    years: "Gắn bó 4 năm",
+    roles: [
+      {
+        name: "Kỹ thuật sự kiện (Trưởng ban)",
+        tasks: [
+          "Vận hành AV, ánh sáng, LED cho 20+ sự kiện lớn (Vietnam Innovation Summit, EA Summit, Unitour, Talkshow...).",
+          "Lên phương án kỹ thuật, điều phối team và xử lý sự cố real-time dưới áp lực cao.",
+          "Setup micro, mixer, livestream cho sự kiện từ 50 — 1000+ người."
+        ]
+      },
+      {
+        name: "Phát triển web CSLUEF.com",
+        tasks: [
+          "Dự án cùng team UEF: React + .NET MVC 5 + SQL Server.",
+          "Số hóa vận hành CLB & dự án cho 500+ sinh viên.",
+          "Tăng 60% hiệu suất so với quy trình Excel thủ công."
+        ]
+      }
+    ]
   },
   languages: [
     { name: "Tiếng Anh", level: "Phổ thông" },
@@ -40,27 +58,27 @@ export const projects = {
       tech: ["React", ".NET MVC 5", "SQL Server", "Tailwind"],
       icon: <Book size={24} />,
       desc: "Nền tảng số hóa giúp quản lý hiệu quả hoạt động câu lạc bộ, dự án và sinh viên tại Trung tâm Service-Learning UEF.",
-      detail: "Dự án nhóm cùng team tại UEF, tập trung vào việc số hóa vận hành cộng đồng, hỗ trợ quản lý thành viên, hoạt động, báo cáo và tăng khả năng kết nối giữa sinh viên với các dự án xã hội.",
+      detail: "Dự án cùng team UEF: tham gia thiết kế kiến trúc, code frontend & backend, triển khai & vận hành production. Backend REST API bằng .NET MVC 5 + SQL Server, quản lý 500+ bản ghi sinh viên/CLB. Frontend React responsive, form phức tạp cho đăng ký & báo cáo. Thay thế quy trình Excel thủ công → tăng 60% hiệu suất vận hành của Trung tâm.",
       link: "https://csluef.com",
       images: []
     },
     {
       title: "Astrodemy.vn",
-      subtitle: "Well-being Consulting & Online Test",
-      tech: ["Next.js", "MongoDB", "Tailwind CSS", "Responsive UI"],
+      subtitle: "Tư vấn & đo lường Well-being (cá nhân & B2B)",
+      tech: ["React", "Vite", "Tailwind CSS", "Figma"],
       icon: <Globe size={24} />,
       desc: "Nền tảng tư vấn Well-being và bài Test Well-being trực tuyến cho cá nhân và doanh nghiệp (gói B2B).",
-      detail: "Dự án cá nhân hợp tác cùng Founder Astrodemy (info@Astrodemy.vn). Website gồm trang giới thiệu dịch vụ tư vấn (Coaching, Consulting, Training) và trang bài Test Well-being trực tuyến — giao diện hiện đại, dễ chia sẻ, tối ưu cho cả người dùng cá nhân và khách hàng doanh nghiệp.",
+      detail: "Solo Developer: nhận brief từ Founder → UI/UX trên Figma → sản phẩm hoàn chỉnh. Gồm trang tư vấn (Coaching, Consulting, Training) và trang bài Test Well-being trực tuyến — giao diện hiện đại, dễ chia sẻ. React + Vite + Tailwind, animation mượt, Lighthouse 90+, SEO chuẩn.",
       link: "https://astrodemy.vn",
       images: []
     },
     {
       title: "FounderAI.biz",
-      subtitle: "Marketing Automation via Zalo & Email",
-      tech: ["React", "Node.js", "PostgreSQL", "Tailwind CSS"],
+      subtitle: "Đồng sáng lập AI cho doanh nghiệp một người — Marketing qua Zalo & Email",
+      tech: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
       icon: <Smartphone size={24} />,
-      desc: "Nền tảng tự động hóa marketing đa kênh qua Zalo (OA/ZNS) và Email cho doanh nghiệp và nhà sáng lập.",
-      detail: "Dự án nhóm cùng team tại Digiso trong thời gian thực tập. Tập trung xây dựng landing page và dashboard cho hệ thống gửi tin nhắn Zalo/Email tự động theo kịch bản marketing. UI chuyển đổi cao, tích hợp tracking pixel và form chuyển đổi sẵn sàng A/B test.",
+      desc: "Nền tảng AI tự động hóa marketing đa kênh qua Zalo và Email cho doanh nghiệp và nhà sáng lập.",
+      detail: "Nền tảng AI do Digiso phát triển. Solo Frontend: dựng landing page & dashboard, tích hợp Zalo + Email, tracking pixel, form chuyển đổi A/B test. UI chuyển đổi cao, tối ưu Lighthouse 90+. Từ brief → production trong vài ngày. Dự án thực tập tại Digiso.",
       link: "https://founderai.biz",
       images: []
     }
@@ -209,27 +227,4 @@ export const techStack = [
   { category: "Frontend", items: ["React", "Next.js", "Tailwind CSS", "Framer Motion"] },
   { category: "Backend & DB", items: ["Node.js", "Spring Boot", "SQL Server", "MongoDB"] },
   { category: "Công cụ", items: ["Git", "Docker", "Figma", "Postman"] }
-];
-
-export const timeline = [
-  {
-    year: "2026 - Hiện tại",
-    title: "Lập trình viên chính thức @ Digiso",
-    desc: "Gia nhập Công ty TNHH Giải pháp số Digiso với vị trí Lập trình viên chính thức từ ngày 01/08/2026, sau 3 tháng thực tập từ 20/04/2026 đến 20/07/2026. Tham gia phát triển các giải pháp số cho khách hàng doanh nghiệp."
-  },
-  {
-    year: "04 - 07/2026",
-    title: "Thực tập Lập trình viên @ Digiso",
-    desc: "Hoàn thành 3 tháng thực tập tại Công ty TNHH Giải pháp số Digiso (20/04/2026 - 20/07/2026). Làm quen môi trường làm việc chuyên nghiệp, tham gia xây dựng và triển khai các sản phẩm số thực tế."
-  },
-  {
-    year: "2024 - 2026",
-    title: "Thực chiến Đồ án & Chuyên ngành",
-    desc: "Xây dựng các hệ thống quản lý (Desktop, Web, Mobile) với đa dạng công nghệ từ Java, C# đến React Native."
-  },
-  {
-    year: "2022",
-    title: "Bắt đầu hành trình tại UEF",
-    desc: "Nhập học chuyên ngành Công nghệ Phần mềm. Làm quen với tư duy logic, cấu trúc dữ liệu và giải thuật."
-  }
 ];

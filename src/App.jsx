@@ -1,49 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, Linkedin, Mail, Code2, Headphones, FileText, X, Camera, Layout, ChevronRight, Images, ChevronLeft, Quote, ExternalLink, RefreshCw, Wifi, Eye, Maximize2 } from 'lucide-react';
-import { profile, projects, events, techStack, timeline } from './data';
-import Invitation from './pages/Invitation';
-import { guestList } from './guests';
-
-/* ---------- Router: hỗ trợ cả /thiepmoi/<slug> (path) và #/thiepmoi/<slug> (hash) ---------- */
-function useHashRoute() {
-  const [hash, setHash] = useState(() => {
-    if (typeof window === 'undefined') return '';
-    // Nếu truy cập dạng path /thiepmoi/<slug> → đổi sang hash để SPA hoạt động
-    const pathMatch = window.location.pathname.match(/^\/thiepmoi\/(.+?)\/?$/);
-    if (pathMatch) {
-      const slug = pathMatch[1];
-      const qs = window.location.search || '';
-      const newUrl = `${window.location.origin}/${qs}#/thiepmoi/${slug}`;
-      window.history.replaceState(null, '', newUrl);
-      return `#/thiepmoi/${slug}`;
-    }
-    return window.location.hash;
-  });
-
-  useEffect(() => {
-    const onChange = () => setHash(window.location.hash);
-    window.addEventListener('hashchange', onChange);
-    return () => window.removeEventListener('hashchange', onChange);
-  }, []);
-
-  return hash;
-}
-
-function parseInvitationRoute(hash) {
-  // Hỗ trợ: #/thiepmoi/<slug>
-  const match = hash.match(/^#\/thiepmoi\/(.+)$/);
-  if (!match) return null;
-  const raw = decodeURIComponent(match[1]);
-  // Bỏ query string nếu có (?open=1)
-  const slug = raw.split('?')[0].trim();
-
-  // Map slug → name (tên có dấu) từ guestList
-  const found = guestList.find((g) => g.slug.toLowerCase() === slug.toLowerCase());
-  const displayName = found ? found.name : slug;
-
-  return { name: displayName, slug };
-}
+import { profile, projects, events, techStack } from './data';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -230,9 +188,6 @@ function LivePreview({ url, title }) {
 
 function App() {
   const [activeView, setActiveView] = useState('developer');
-  const hash = useHashRoute();
-  const inviteRoute = parseInvitationRoute(hash);
-  const isInvitation = !!inviteRoute;
 
   // State mới cho Event Gallery Modal
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -246,11 +201,6 @@ function App() {
     e.stopPropagation();
     setActiveImageIndex((prev) => (prev === 0 ? selectedEvent.images.length - 1 : prev - 1));
   };
-
-  // Nếu đang ở trang thiệp mời → render component thiệp, không render portfolio
-  if (isInvitation) {
-    return <Invitation guestName={inviteRoute.name} />;
-  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-600 overflow-x-hidden">
@@ -431,21 +381,6 @@ function App() {
                 </div>
               </motion.section>
 
-              {/* Timeline */}
-              <section className="py-20 border-t border-slate-200/60">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-12">Hành trình học tập</h3>
-                <div className="relative border-l-2 border-blue-100 ml-3 md:ml-4 space-y-12">
-                  {timeline.map((item, index) => (
-                    <motion.div key={index} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.2 }} className="relative pl-8">
-                      <div className="absolute w-4 h-4 bg-white border-4 border-blue-500 rounded-full -left-[9px] top-1"></div>
-                      <span className="text-blue-600 font-bold text-sm tracking-widest">{item.year}</span>
-                      <h4 className="text-xl font-bold text-slate-900 mt-1 mb-2">{item.title}</h4>
-                      <p className="text-slate-500 font-medium leading-relaxed max-w-2xl">{item.desc}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </section>
-
               {/* Work Experience & Languages */}
               <section className="py-16 border-t border-slate-200/60">
                 <div className="grid md:grid-cols-5 gap-10">
@@ -453,7 +388,7 @@ function App() {
                   <div className="md:col-span-3">
                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Kinh nghiệm làm việc</h3>
 
-                    {/* Nhân viên chính thức */}
+                    {/* Thực tập */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -463,17 +398,16 @@ function App() {
                     >
                       <div className="absolute w-4 h-4 bg-blue-500 rounded-full -left-[9px] top-1 ring-4 ring-blue-100"></div>
                       <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-                        Hiện tại · {profile.currentRole.startDate}
+                        {profile.internship.duration}
                       </span>
-                      <h4 className="text-xl font-bold text-slate-900 mt-3 mb-1">{profile.currentRole.title}</h4>
-                      <p className="text-slate-500 font-semibold mb-3">{profile.currentRole.company}</p>
+                      <h4 className="text-xl font-bold text-slate-900 mt-3 mb-1">{profile.internship.title}</h4>
+                      <p className="text-slate-500 font-semibold mb-3">{profile.internship.company}</p>
                       <p className="text-slate-500 font-medium leading-relaxed">
-                        Phát triển và triển khai các giải pháp số cho khách hàng doanh nghiệp. Phối hợp chặt chẽ với team
-                        để phân tích yêu cầu, thiết kế và vận hành sản phẩm trong môi trường chuyên nghiệp.
+                        Hoàn thành {profile.internship.months} thực tập tại Digiso. {profile.internship.note}. Tham gia trực tiếp vào các dự án phát triển sản phẩm số và quy trình vận hành thực tế.
                       </p>
                     </motion.div>
 
-                    {/* Thực tập */}
+                    {/* UEF Experience */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -483,13 +417,25 @@ function App() {
                     >
                       <div className="absolute w-4 h-4 bg-white border-4 border-slate-300 rounded-full -left-[9px] top-1"></div>
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        {profile.internship.duration}
+                        {profile.uefExperience.duration}
                       </span>
-                      <h4 className="text-lg font-bold text-slate-700 mt-3 mb-1">{profile.internship.title}</h4>
-                      <p className="text-slate-500 font-semibold mb-3">{profile.internship.company}</p>
-                      <p className="text-slate-500 font-medium leading-relaxed">
-                        Hoàn thành {profile.internship.months} thực tập tại Digiso. {profile.internship.note}. Tham gia trực tiếp vào các dự án phát triển sản phẩm số và quy trình vận hành thực tế.
+                      <h4 className="text-lg font-bold text-slate-700 mt-3 mb-1">{profile.uefExperience.title}</h4>
+                      <p className="text-slate-500 font-semibold mb-3">{profile.uefExperience.company}</p>
+                      <p className="text-slate-500 font-medium leading-relaxed italic mb-4">
+                        Suốt gần 4 năm đại học, vừa cầm micro cầm mixer, vừa cầm bàn phím gõ code. Hai mảng nghe tách biệt, nhưng cùng chung một tư duy: <strong>làm cho mọi thứ vận hành trơn tru</strong>.
                       </p>
+                      <div className="grid grid-cols-2 gap-4">
+                        {profile.uefExperience.roles.map((role, idx) => (
+                          <div key={idx}>
+                            <p className="text-[10px] font-black text-blue-600 uppercase mb-2">▸ {role.name}</p>
+                            <ul className="text-sm text-slate-600 list-disc ml-4 leading-relaxed space-y-1">
+                              {role.tasks.map((task, i) => (
+                                <li key={i}>{task}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
                     </motion.div>
                   </div>
 
@@ -508,7 +454,7 @@ function App() {
                           <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                             <motion.div
                               initial={{ width: 0 }}
-                              whileInView={{ width: lang.name === 'Tiếng Anh' ? '65%' : '35%' }}
+                              whileInView={{ width: lang.name === 'Tiếng Anh' ? '65%' : '30%' }}
                               viewport={{ once: true }}
                               transition={{ duration: 1.2, delay: i * 0.2, ease: 'easeOut' }}
                               className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full"

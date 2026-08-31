@@ -2,7 +2,7 @@
 // Chạy trên edge network TRƯỚC khi response về client
 // → Inject OG meta tags động theo URL (slug → tên có dấu)
 
-const SITE_URL = 'https://sennahoangphuc.vercel.app';
+const SITE_URL = 'https://phucphuc.id.vn';
 
 // Hardcode guest list để tránh edge runtime không bundle được ESM imports
 const guestList = [

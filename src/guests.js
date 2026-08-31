@@ -1,5 +1,5 @@
 // Danh sách khách mời lễ tốt nghiệp
-// Cách dùng: Mở link https://sennahoangphuc.vercel.app/#/thiepmoi/<Tên trong URL>
+// Cách dùng: Mở link https://phucphuc.id.vn/#/thiepmoi/<Tên trong URL>
 // Gợi ý: dùng encodeURIComponent() cho tên có dấu cách / ký tự đặc biệt
 
 export const guestList = [
@@ -13,7 +13,7 @@ export const guestList = [
 ];
 
 // Helper: tạo link thiệp mời nhanh
-export const buildInviteUrl = (slug, baseUrl = 'https://sennahoangphuc.vercel.app') => {
+export const buildInviteUrl = (slug, baseUrl = 'https://phucphuc.id.vn') => {
   return `${baseUrl}/#/thiepmoi/${slug}`;
 };
 

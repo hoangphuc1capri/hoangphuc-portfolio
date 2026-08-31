@@ -2,15 +2,33 @@ import { Globe, Smartphone, Book, Award, Code2, Database, Terminal } from 'lucid
 
 export const profile = {
   name: "Nguyễn Hoàng Phúc",
-  role: "Web Developer Student @ UEF",
-  bio: "Sinh viên năm cuối chuyên ngành Công nghệ Phần mềm tại UEF. Với tư duy giải quyết vấn đề dựa trên thực tiễn, mình tập trung xây dựng các sản phẩm số hữu ích, hiện đại và có thể triển khai thực tế.",
+  role: "Software Developer @ Digiso",
+  bio: "Lập trình viên chính thức tại Công ty TNHH Giải pháp số Digiso. Tốt nghiệp chuyên ngành Công nghệ Phần mềm tại UEF với tư duy giải quyết vấn đề dựa trên thực tiễn, tập trung xây dựng các sản phẩm số hữu ích, hiện đại và có thể triển khai thực tế.",
   university: "Đại học Kinh tế - Tài chính TP.HCM (UEF)",
   major: "Công nghệ Phần mềm",
   birthYear: "2004",
+  currentRole: {
+    title: "Lập trình viên",
+    company: "Công ty TNHH Giải pháp số Digiso",
+    type: "Nhân viên chính thức",
+    startDate: "01/08/2026"
+  },
+  internship: {
+    title: "Thực tập sinh Lập trình viên",
+    company: "Công ty TNHH Giải pháp số Digiso",
+    duration: "20/04/2026 - 20/07/2026",
+    months: "3 tháng",
+    note: "Trong thời gian thực tập, đã phát triển dự án FounderAI.biz cùng team."
+  },
+  languages: [
+    { name: "Tiếng Anh", level: "Phổ thông" },
+    { name: "Tiếng Nhật", level: "Cơ bản" }
+  ],
   social: {
     github: "https://github.com/hoangphuc1capri",
     linkedin: "www.linkedin.com/in/sennahoangphuc0501",
-    email: "hoangphuc.capri.0501@gmail.com"
+    email: "hoangphuc.capri.0501@gmail.com",
+    portfolio: "https://phucphuc.id.vn"
   }
 };
 
@@ -22,27 +40,27 @@ export const projects = {
       tech: ["React", ".NET MVC 5", "SQL Server", "Tailwind"],
       icon: <Book size={24} />,
       desc: "Nền tảng số hóa giúp quản lý hiệu quả hoạt động câu lạc bộ, dự án và sinh viên tại Trung tâm Service-Learning UEF.",
-      detail: "Dự án tập trung vào việc số hóa vận hành cộng đồng, hỗ trợ quản lý thành viên, hoạt động, báo cáo và tăng khả năng kết nối giữa sinh viên với các dự án xã hội.",
+      detail: "Dự án nhóm cùng team tại UEF, tập trung vào việc số hóa vận hành cộng đồng, hỗ trợ quản lý thành viên, hoạt động, báo cáo và tăng khả năng kết nối giữa sinh viên với các dự án xã hội.",
       link: "https://csluef.com",
       images: []
     },
     {
       title: "Astrodemy.vn",
-      subtitle: "Well-being & Learning Platform",
-      tech: ["React", "Vite", "Tailwind CSS", "Responsive UI"],
+      subtitle: "Well-being Consulting & Online Test",
+      tech: ["Next.js", "MongoDB", "Tailwind CSS", "Responsive UI"],
       icon: <Globe size={24} />,
-      desc: "Website tập trung vào tư vấn, đào tạo và xây dựng văn hóa well-being với trải nghiệm nội dung hiện đại, rõ ràng.",
-      detail: "Dự án cá nhân được xây dựng với định hướng tạo ra một trải nghiệm số hiện đại, tối ưu hiển thị nội dung, điều hướng mượt và dễ mở rộng cho nhiều chương trình đào tạo khác nhau.",
+      desc: "Nền tảng tư vấn Well-being và bài Test Well-being trực tuyến cho cá nhân và doanh nghiệp (gói B2B).",
+      detail: "Dự án cá nhân hợp tác cùng Founder Astrodemy (info@Astrodemy.vn). Website gồm trang giới thiệu dịch vụ tư vấn (Coaching, Consulting, Training) và trang bài Test Well-being trực tuyến — giao diện hiện đại, dễ chia sẻ, tối ưu cho cả người dùng cá nhân và khách hàng doanh nghiệp.",
       link: "https://astrodemy.vn",
       images: []
     },
     {
       title: "FounderAI.biz",
-      subtitle: "AI Marketing Platform",
-      tech: ["React", "Vite", "Tailwind CSS"],
+      subtitle: "Marketing Automation via Zalo & Email",
+      tech: ["React", "Node.js", "PostgreSQL", "Tailwind CSS"],
       icon: <Smartphone size={24} />,
-      desc: "Nền tảng tự động hóa marketing đa kênh, tập trung vào chuyển đổi và trải nghiệm sản phẩm.",
-      detail: "Dự án cá nhân định hướng thương mại hóa, nhấn mạnh trải nghiệm hiện đại, bố cục thuyết phục và khả năng triển khai nhanh cho các chiến dịch marketing số.",
+      desc: "Nền tảng tự động hóa marketing đa kênh qua Zalo (OA/ZNS) và Email cho doanh nghiệp và nhà sáng lập.",
+      detail: "Dự án nhóm cùng team tại Digiso trong thời gian thực tập. Tập trung xây dựng landing page và dashboard cho hệ thống gửi tin nhắn Zalo/Email tự động theo kịch bản marketing. UI chuyển đổi cao, tích hợp tracking pixel và form chuyển đổi sẵn sàng A/B test.",
       link: "https://founderai.biz",
       images: []
     }
@@ -195,12 +213,17 @@ export const techStack = [
 
 export const timeline = [
   {
-    year: "2026",
-    title: "Chuẩn bị Tốt nghiệp & Tìm kiếm cơ hội",
-    desc: "Hoàn thiện đồ án doanh nghiệp Service-Learning và sẵn sàng cho các vị trí Intern Web Developer."
+    year: "2026 - Hiện tại",
+    title: "Lập trình viên chính thức @ Digiso",
+    desc: "Gia nhập Công ty TNHH Giải pháp số Digiso với vị trí Lập trình viên chính thức từ ngày 01/08/2026, sau 3 tháng thực tập từ 20/04/2026 đến 20/07/2026. Tham gia phát triển các giải pháp số cho khách hàng doanh nghiệp."
   },
   {
-    year: "2024 - 2025",
+    year: "04 - 07/2026",
+    title: "Thực tập Lập trình viên @ Digiso",
+    desc: "Hoàn thành 3 tháng thực tập tại Công ty TNHH Giải pháp số Digiso (20/04/2026 - 20/07/2026). Làm quen môi trường làm việc chuyên nghiệp, tham gia xây dựng và triển khai các sản phẩm số thực tế."
+  },
+  {
+    year: "2024 - 2026",
     title: "Thực chiến Đồ án & Chuyên ngành",
     desc: "Xây dựng các hệ thống quản lý (Desktop, Web, Mobile) với đa dạng công nghệ từ Java, C# đến React Native."
   },

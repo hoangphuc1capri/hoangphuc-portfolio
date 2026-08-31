@@ -310,7 +310,7 @@ function App() {
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
                     </span>
                     <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                      Web Developer Student • UEF
+                      Software Developer • Digiso · UEF Alumni
                     </span>
                   </div>
 
@@ -443,6 +443,81 @@ function App() {
                       <p className="text-slate-500 font-medium leading-relaxed max-w-2xl">{item.desc}</p>
                     </motion.div>
                   ))}
+                </div>
+              </section>
+
+              {/* Work Experience & Languages */}
+              <section className="py-16 border-t border-slate-200/60">
+                <div className="grid md:grid-cols-5 gap-10">
+                  {/* Cột kinh nghiệm làm việc */}
+                  <div className="md:col-span-3">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Kinh nghiệm làm việc</h3>
+
+                    {/* Nhân viên chính thức */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                      className="relative pl-8 pb-8 border-l-2 border-blue-500"
+                    >
+                      <div className="absolute w-4 h-4 bg-blue-500 rounded-full -left-[9px] top-1 ring-4 ring-blue-100"></div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                        Hiện tại · {profile.currentRole.startDate}
+                      </span>
+                      <h4 className="text-xl font-bold text-slate-900 mt-3 mb-1">{profile.currentRole.title}</h4>
+                      <p className="text-slate-500 font-semibold mb-3">{profile.currentRole.company}</p>
+                      <p className="text-slate-500 font-medium leading-relaxed">
+                        Phát triển và triển khai các giải pháp số cho khách hàng doanh nghiệp. Phối hợp chặt chẽ với team
+                        để phân tích yêu cầu, thiết kế và vận hành sản phẩm trong môi trường chuyên nghiệp.
+                      </p>
+                    </motion.div>
+
+                    {/* Thực tập */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.1 }}
+                      className="relative pl-8 border-l-2 border-slate-200"
+                    >
+                      <div className="absolute w-4 h-4 bg-white border-4 border-slate-300 rounded-full -left-[9px] top-1"></div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        {profile.internship.duration}
+                      </span>
+                      <h4 className="text-lg font-bold text-slate-700 mt-3 mb-1">{profile.internship.title}</h4>
+                      <p className="text-slate-500 font-semibold mb-3">{profile.internship.company}</p>
+                      <p className="text-slate-500 font-medium leading-relaxed">
+                        Hoàn thành {profile.internship.months} thực tập tại Digiso. {profile.internship.note}. Tham gia trực tiếp vào các dự án phát triển sản phẩm số và quy trình vận hành thực tế.
+                      </p>
+                    </motion.div>
+                  </div>
+
+                  {/* Cột ngoại ngữ */}
+                  <div className="md:col-span-2">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Ngoại ngữ</h3>
+                    <div className="space-y-6 bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm">
+                      {profile.languages.map((lang, i) => (
+                        <div key={lang.name}>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-base font-bold text-slate-800">{lang.name}</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                              {lang.level}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              whileInView={{ width: lang.name === 'Tiếng Anh' ? '65%' : '35%' }}
+                              viewport={{ once: true }}
+                              transition={{ duration: 1.2, delay: i * 0.2, ease: 'easeOut' }}
+                              className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </section>
 
@@ -609,13 +684,38 @@ function App() {
         <footer className="py-20 border-t border-slate-200">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-6 italic text-slate-800">Sẵn sàng đồng hành cùng bạn!</h2>
-            <div className="flex justify-center gap-6">
-              <a href={profile.social.github} className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white transition shadow-sm"><Github size={20} /></a>
-              <a href={profile.social.linkedin} className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition shadow-sm"><Linkedin size={20} /></a>
-              <a href={`mailto:${profile.social.email}`} className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-rose-500 hover:text-white transition shadow-sm"><Mail size={20} /></a>
+
+            {/* QR Code + Social */}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-6">
+              <a href={profile.social.portfolio} target="_blank" rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-2 transition-transform hover:scale-105">
+                <div className="bg-white p-3 rounded-2xl border-2 border-blue-600 shadow-lg shadow-blue-500/10">
+                  <img src="/qr-phucphuc.png" alt="QR phucphuc.id.vn" className="w-28 h-28 block" />
+                </div>
+                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                  phucphuc.id.vn ↗
+                </span>
+              </a>
+              <div className="flex flex-col items-center gap-3">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                  Kết nối nhanh
+                </span>
+                <div className="flex gap-4">
+                  <a href={profile.social.github}
+                    className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white transition shadow-sm"><Github
+                      size={20} /></a>
+                  <a href={profile.social.linkedin}
+                    className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition shadow-sm"><Linkedin
+                      size={20} /></a>
+                  <a href={`mailto:${profile.social.email}`}
+                    className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-rose-500 hover:text-white transition shadow-sm"><Mail
+                      size={20} /></a>
+                </div>
+              </div>
             </div>
-            <p className="mt-8 text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
-              © 2026 NGUYỄN HOÀNG PHÚC • UEF
+
+            <p className="mt-6 text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
+              © 2026 NGUYỄN HOÀNG PHÚC · phucphuc.id.vn
             </p>
           </div>
         </footer>

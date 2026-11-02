@@ -1,353 +1,377 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV - Nguyễn Hoàng Phúc · phucphuc.id.vn</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV - Nguyễn Hoàng Phúc · Software Developer & Event Technical Director</title>
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
+  <!-- Google Fonts: Kanit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            kanit: ['Kanit', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            emeraldPrimary: '#059669',
+            emeraldDark: '#064e3b',
+            emeraldLight: '#10b981',
+            mintBadge: '#ecfdf5',
+          }
         }
+      }
+    }
+  </script>
 
-        @page {
-            size: A4;
-            margin: 0;
-        }
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #040806;
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
 
-        @media print {
-            .no-print { display: none !important; }
-            body { background-color: white; }
-            .a4-page {
-                box-shadow: none !important;
-                margin: 0 !important;
-                width: 210mm;
-                height: 297mm;
-                padding: 12mm 14mm !important;
-            }
-        }
+    @page {
+      size: A4;
+      margin: 0;
+    }
 
-        .a4-page {
-            width: 210mm;
-            height: 297mm;
-            padding: 12mm 14mm;
-            margin: 10px auto;
-            background: white;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow: visible;
-        }
+    @media print {
+      .no-print { display: none !important; }
+      body { background-color: white !important; }
+      .a4-page {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        padding: 9mm 12mm !important;
+        border-radius: 0 !important;
+      }
+    }
 
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 900;
-            color: #1e40af;
-            margin-bottom: 6px;
-            margin-top: 10px;
-        }
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 10mm 13mm;
+      margin: 20px auto;
+      background: white;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-        .section-title::before {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 2.5px;
-            background: #2563eb;
-        }
-
-        .pill {
-            display: inline-block;
-            padding: 2px 7px;
-            border-radius: 999px;
-            font-size: 7.5px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            line-height: 1.5;
-        }
-
-        .qr-frame {
-            background: white;
-            padding: 5px;
-            border: 2px solid #1e40af;
-            border-radius: 9px;
-        }
-    </style>
+    .section-heading {
+      font-family: 'Kanit', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: #059669;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 2.5px;
+    }
+    .section-heading::before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 3px;
+      background: #059669;
+      border-radius: 2px;
+    }
+  </style>
 </head>
 
 <body>
 
-    <div class="no-print flex justify-center py-3">
-        <button onclick="window.print()"
-            class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-blue-700 transition text-sm">
-            In / Tải PDF (A4, 1 trang)
-        </button>
+  <!-- Floating Print Bar for Screen View -->
+  <div class="no-print sticky top-3 z-50 flex justify-center items-center gap-4 py-2">
+    <div class="bg-slate-900/90 backdrop-blur-md px-5 py-2.5 rounded-full border border-slate-700 shadow-2xl flex items-center gap-4">
+      <span class="text-xs text-slate-300 font-mono">Bản CV A4 Hiện Đại · Lập trình viên Digiso</span>
+      <button onclick="window.print()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-1.5 rounded-full text-xs transition flex items-center gap-1.5 shadow-md">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        <span>In / Lưu PDF (A4 1 Trang)</span>
+      </button>
+      <a href="/" class="text-xs text-slate-400 hover:text-white transition">← Về Portfolio</a>
     </div>
+  </div>
 
-    <div class="a4-page text-slate-800">
+  <!-- A4 Single Page Container -->
+  <div class="a4-page">
 
-        <!-- ==================== HEADER ==================== -->
-        <header class="flex items-center gap-3 pb-3 border-b-2 border-slate-900">
-            <!-- Avatar -->
-            <div class="relative flex-shrink-0">
-                <div class="w-36 h-36 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-md">
-                    <img src="avatar.png" alt="Nguyễn Hoàng Phúc"
-                        class="w-full h-full object-contain scale-110 translate-y-1">
-                </div>
+    <!-- Top Header -->
+    <header class="border-b-2 border-slate-900 pb-3">
+      <div class="flex justify-between items-start">
+        
+        <div class="flex items-start gap-4">
+          <img 
+            src="/avatar.png" 
+            alt="Nguyễn Hoàng Phúc" 
+            class="w-16 h-16 rounded-xl object-cover border border-slate-300 shadow-sm shrink-0" 
+            onerror="this.style.display='none'"
+          />
+          <div>
+            <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-mono font-bold tracking-widest uppercase mb-1">
+              <span>●</span>
+              <span>Software Developer @ Digiso &amp; Event Technical Director</span>
             </div>
-
-            <!-- Tên + Role + Liên hệ -->
-            <div class="flex-1 min-w-0">
-                <h1 class="text-[32px] font-black text-slate-900 tracking-tighter leading-none">
-                    Nguyễn Hoàng <span class="text-blue-600">Phúc</span>
-                </h1>
-                <p class="text-[12px] font-bold text-slate-500 tracking-widest mt-1.5 uppercase">
-                    Software Developer · Technical Event Leader
-                </p>
-                <div class="flex flex-wrap gap-x-3 gap-y-0 mt-2 text-[10px] font-bold text-slate-600">
-                    <span>📞 0844.790.999</span>
-                    <span>✉ hoangphuc.capri.0501@gmail.com</span>
-                    <span>📍 Bình Thạnh, TP.HCM</span>
-                    <span>🐙 github.com/hoangphuc1capri</span>
-                    <span>💼 linkedin.com/in/sennahoangphuc0501</span>
-                </div>
-            </div>
-
-            <!-- QR Code -->
-            <div class="flex flex-col items-center gap-1.5 flex-shrink-0">
-                <div class="qr-frame">
-                    <img src="qr-phucphuc.png" alt="QR phucphuc.id.vn" class="w-20 h-20 block">
-                </div>
-                <a href="https://phucphuc.id.vn" target="_blank"
-                    class="text-[8.5px] font-black text-blue-600 hover:underline uppercase tracking-wider">phucphuc.id.vn ↗</a>
-            </div>
-        </header>
-
-        <!-- ==================== TÓM TẮT ==================== -->
-        <section>
-            <h3 class="section-title">Tóm tắt chuyên môn</h3>
-            <p class="text-[10.5px] leading-relaxed text-slate-700 font-medium">
-                Tốt nghiệp Công nghệ Phần mềm — UEF. Hoàn thành <strong>3 tháng thực tập tại Digiso</strong>, phát triển dự án FounderAI.biz.
-                Đam mê biến ý tưởng thành sản phẩm thật, từ web fullstack đến landing page marketing chuyển đổi cao.
-                Bên cạnh code, vận hành <strong>kỹ thuật sự kiện</strong> (AV, LED, livestream) — rèn tư duy xử lý sự cố
-                real-time dưới áp lực.
+            <h1 class="font-kanit font-black text-3xl tracking-tight uppercase text-slate-950 leading-none mt-1">
+              NGUYỄN HOÀNG PHÚC
+            </h1>
+            <p class="text-[11px] text-slate-600 mt-1 max-w-md font-light leading-snug">
+              Cử nhân Công nghệ Phần mềm UEF. Lập trình viên chính thức tại Digiso (từ 08/2026), tham gia phát triển MADA AI Assistant &amp; FounderAI.biz. 4 năm Trưởng ban Kỹ thuật CSL điều phối âm thanh, ánh sáng, LED cho 20+ sự kiện 1000+ người.
             </p>
-        </section>
+          </div>
+        </div>
 
-        <!-- ==================== KINH NGHIỆM LÀM VIỆC (2 CỘT) ==================== -->
-        <section>
-            <h3 class="section-title">Kinh nghiệm làm việc</h3>
+        <!-- Contact Box -->
+        <div class="text-[10px] font-mono space-y-1 text-right text-slate-600 shrink-0 pl-4 border-l border-slate-200">
+          <div><strong class="text-slate-800">Email:</strong> hoangphuc.capri.0501@gmail.com</div>
+          <div><strong class="text-slate-800">Phone/Zalo:</strong> 0844.790.999</div>
+          <div><strong class="text-slate-800">Telegram:</strong> @hoangphuc_capri</div>
+          <div><strong class="text-slate-800">Portfolio:</strong> phucphuc.id.vn</div>
+          <div><strong class="text-slate-800">LinkedIn:</strong> linkedin.com/in/sennahoangphuc0501</div>
+          <div><strong class="text-slate-800">Địa điểm:</strong> TP. Hồ Chí Minh, Việt Nam</div>
+        </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <!-- Cột trái: Digiso -->
-                <div class="pl-2.5 border-l-2 border-blue-500">
-                    <div class="flex justify-between items-start gap-1">
-                        <div>
-                            <div class="flex items-center gap-1 flex-wrap">
-                                <span class="pill bg-blue-600 text-white">Thực tập</span>
-                                <span class="pill bg-blue-50 text-blue-700">3 tháng</span>
-                            </div>
-                            <h4 class="font-extrabold text-slate-900 text-[13px] mt-1 leading-tight">Thực tập sinh Lập trình viên</h4>
-                            <p class="text-[10.5px] font-bold text-blue-700">Công ty TNHH Giải pháp số Digiso</p>
-                        </div>
-                        <span class="text-[9px] font-black text-slate-500 whitespace-nowrap">20/04 — 20/07/2026</span>
-                    </div>
-                    <ul class="text-[9.5px] text-slate-600 list-disc ml-4 mt-1.5 leading-relaxed space-y-1">
-                        <li>Hoàn thành 3 tháng thực tập, mentor dẫn dắt qua sprint, review code, Git flow.</li>
-                        <li>Tham gia xây dựng nền tảng AI Marketing (FounderAI.biz) cùng team.</li>
-                        <li>Fix bug, viết unit test, tích hợp API vào sản phẩm thật.</li>
-                        <li>Làm quen môi trường làm việc chuyên nghiệp, vận hành production.</li>
-                    </ul>
-                </div>
+      </div>
+    </header>
 
-                <!-- Cột phải: UEF -->
-                <div class="pl-2.5 border-l-2 border-slate-300">
-                    <div class="flex justify-between items-start gap-1">
-                        <div>
-                            <div class="flex items-center gap-1 flex-wrap">
-                                <span class="pill bg-slate-900 text-white">Gắn bó 4 năm</span>
-                                <span class="pill bg-blue-50 text-blue-700">Trưởng ban KT</span>
-                            </div>
-                            <h4 class="font-bold text-slate-700 text-[11.5px] mt-1 leading-tight">Trưởng ban Kỹ thuật &amp; Dev CSLUEF.com</h4>
-                            <p class="text-[10.5px] font-bold text-slate-600">Trung tâm Kết nối cộng đồng — UEF</p>
-                        </div>
-                        <span class="text-[9px] font-black text-slate-500 whitespace-nowrap">09/2022 — 04/2026</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2.5 mt-1.5">
-                        <div>
-                            <p class="text-[8.5px] font-black text-blue-700 uppercase leading-none mb-1">▸ Kỹ thuật sự kiện</p>
-                            <ul class="text-[9px] text-slate-600 list-disc ml-3.5 leading-relaxed">
-                                <li>Vận hành AV, LED cho 20+ sự kiện (Vietnam Innovation Summit, EA Summit, Unitour, Talkshow...).</li>
-                                <li>Điều phối team, xử lý sự cố real-time dưới áp lực cao.</li>
-                                <li>Setup micro, mixer, livestream cho sự kiện 50 — 1000+ người.</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <p class="text-[8.5px] font-black text-blue-700 uppercase leading-none mb-1">▸ Phát triển web</p>
-                            <ul class="text-[9px] text-slate-600 list-disc ml-3.5 leading-relaxed">
-                                <li>Dự án cùng team UEF: React + .NET MVC 5 + SQL Server.</li>
-                                <li>Số hóa vận hành CLB &amp; dự án cho 500+ sinh viên.</li>
-                                <li>Tăng 60% hiệu suất so với quy trình Excel thủ công.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+    <!-- Main Grid: 33% Left Column - 67% Right Column -->
+    <div class="grid grid-cols-12 gap-5 my-auto pt-2.5">
+      
+      <!-- ================= LEFT COLUMN ================= -->
+      <aside class="col-span-4 space-y-3 pr-2 border-r border-slate-200">
+        
+        <!-- Tech Stack -->
+        <div>
+          <h2 class="section-heading">Kỹ năng Lập trình</h2>
+          <div class="space-y-1 text-[10px]">
+            <div>
+              <strong class="text-slate-900 block font-bold">Frontend:</strong>
+              <span class="text-slate-600 leading-tight block">React 19, Next.js, Vite, Tailwind CSS, Framer Motion, AI Stream</span>
             </div>
-        </section>
-
-        <!-- ==================== DỰ ÁN (3 HÀNG, MỖI HÀNG 1 DÒNG CHẶT) ==================== -->
-        <section>
-            <h3 class="section-title">Dự án cá nhân nổi bật</h3>
-
-            <div class="space-y-2.5">
-                <!-- Dự án 1: CSLUEF.com -->
-                <div class="px-2.5 py-2 bg-slate-50 rounded border border-slate-100">
-                    <div class="flex justify-between items-baseline gap-2">
-                        <div class="flex items-baseline gap-1.5 flex-wrap">
-                            <h4 class="font-extrabold text-slate-900 text-[11.5px] leading-none">CSLUEF.com</h4>
-                            <span class="text-[8.5px] font-bold text-blue-600 uppercase tracking-wider">Nền tảng quản lý cộng đồng Service-Learning UEF</span>
-                        </div>
-                        <a href="https://csluef.com" target="_blank" class="text-[8.5px] font-black text-blue-600 uppercase hover:underline whitespace-nowrap">csluef.com ↗</a>
-                    </div>
-                    <div class="flex justify-between gap-3 mt-1">
-                        <p class="text-[9.5px] text-slate-600 leading-relaxed flex-1">
-                            <strong>Dự án cùng team UEF:</strong> React + .NET MVC 5 + SQL Server. Tự động hóa đăng ký, báo cáo cho <strong>500+ sinh viên</strong> · thay thế Excel thủ công · tăng <strong>60% hiệu suất</strong> vận hành Trung tâm. Tích hợp đăng nhập, phân quyền, xuất PDF/Excel.
-                        </p>
-                        <div class="flex flex-wrap gap-1 shrink-0 content-start">
-                            <span class="pill bg-white border border-slate-200 text-slate-600">React</span>
-                            <span class="pill bg-white border border-slate-200 text-slate-600">.NET 5</span>
-                            <span class="pill bg-white border border-slate-200 text-slate-600">SQL Server</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dự án 2: Astrodemy.vn -->
-                <div class="px-2.5 py-2 bg-slate-50 rounded border border-slate-100">
-                    <div class="flex justify-between items-baseline gap-2">
-                        <div class="flex items-baseline gap-1.5 flex-wrap">
-                            <h4 class="font-extrabold text-slate-900 text-[11.5px] leading-none">Astrodemy.vn</h4>
-                            <span class="text-[8.5px] font-bold text-blue-600 uppercase tracking-wider">Tư vấn &amp; đo lường Well-being (cá nhân &amp; B2B)</span>
-                        </div>
-                        <a href="https://astrodemy.vn" target="_blank" class="text-[8.5px] font-black text-blue-600 uppercase hover:underline whitespace-nowrap">astrodemy.vn ↗</a>
-                    </div>
-                    <div class="flex justify-between gap-3 mt-1">
-                        <p class="text-[9.5px] text-slate-600 leading-relaxed flex-1">
-                            <strong>Solo Developer:</strong> nhận brief từ Founder → UI/UX trên Figma → sản phẩm hoàn chỉnh. Gồm trang tư vấn (Coaching, Consulting) và bài Test Well-being trực tuyến. React + Vite + Tailwind, animation mượt, Lighthouse 90+, SEO chuẩn.
-                        </p>
-                        <div class="flex flex-wrap gap-1 shrink-0 content-start">
-                            <span class="pill bg-white border border-slate-200 text-slate-600">React</span>
-                            <span class="pill bg-white border border-slate-200 text-slate-600">Vite</span>
-                            <span class="pill bg-white border border-slate-200 text-slate-600">Tailwind</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dự án 3: FounderAI.biz -->
-                <div class="px-2.5 py-2 bg-slate-50 rounded border border-slate-100">
-                    <div class="flex justify-between items-baseline gap-2">
-                        <div class="flex items-baseline gap-1.5 flex-wrap">
-                            <h4 class="font-extrabold text-slate-900 text-[11.5px] leading-none">FounderAI.biz</h4>
-                            <span class="text-[8.5px] font-bold text-blue-600 uppercase tracking-wider">Đồng sáng lập AI cho doanh nghiệp một người — Marketing qua Zalo &amp; Email</span>
-                        </div>
-                        <a href="https://founderai.biz" target="_blank" class="text-[8.5px] font-black text-blue-600 uppercase hover:underline whitespace-nowrap">founderai.biz ↗</a>
-                    </div>
-                    <div class="flex justify-between gap-3 mt-1">
-                        <p class="text-[9.5px] text-slate-600 leading-relaxed flex-1">
-                            Nền tảng AI do <strong>Digiso</strong> phát triển. <strong>Team thực tập sinh:</strong> cùng đợt thực tập cùng nhau xây dựng landing page &amp; dashboard, tích hợp Zalo + Email, tracking pixel, form chuyển đổi A/B test. Từ brief → production trong vài ngày.
-                        </p>
-                        <div class="flex flex-wrap gap-1 shrink-0 content-start">
-                            <span class="pill bg-white border border-slate-200 text-slate-600">React</span>
-                            <span class="pill bg-white border border-slate-200 text-slate-600">Vite</span>
-                            <span class="pill bg-white border border-slate-200 text-slate-600">Framer</span>
-                        </div>
-                    </div>
-                </div>
+            <div>
+              <strong class="text-slate-900 block font-bold">Backend &amp; DB:</strong>
+              <span class="text-slate-600 leading-tight block">Node.js, .NET MVC 5, Spring Boot, SQL Server, MongoDB</span>
             </div>
-        </section>
-
-        <!-- ==================== KỸ NĂNG + HỌC VẤN + NGOẠI NGỮ (3 CỘT) ==================== -->
-        <section>
-            <h3 class="section-title">Kỹ năng · Học vấn · Ngoại ngữ</h3>
-            <div class="grid grid-cols-3 gap-4">
-                <div>
-                    <p class="text-[8.5px] font-black text-slate-400 uppercase tracking-widest mb-1">Ngôn ngữ &amp; Framework</p>
-                    <p class="text-[9.5px] font-bold text-slate-700 leading-relaxed">Java, C#, JavaScript, TypeScript, Node.js, React, Next.js, Spring Boot, React Native</p>
-                    <p class="text-[8.5px] font-black text-slate-400 uppercase tracking-widest mb-1 mt-2">CSDL &amp; Công cụ</p>
-                    <p class="text-[9.5px] font-bold text-slate-700 leading-relaxed">SQL Server, MySQL, MongoDB · Git, Docker, Figma, Postman · AV/LED</p>
-                </div>
-                <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
-                    <p class="text-[8.5px] font-black text-slate-400 uppercase tracking-widest mb-1">Học vấn</p>
-                    <p class="font-extrabold text-slate-900 text-[11px] leading-tight">ĐH Kinh tế - Tài chính (UEF)</p>
-                    <p class="text-[9px] text-blue-600 font-black uppercase tracking-tighter mt-1">2022 — 2026 · Tốt nghiệp</p>
-                    <p class="text-[9.5px] text-slate-500 mt-1 font-medium italic">Công nghệ Phần mềm</p>
-                </div>
-                <div class="space-y-2">
-                    <div class="bg-white border border-slate-100 rounded p-2">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] font-extrabold text-slate-800">Tiếng Anh</span>
-                            <span class="pill bg-blue-50 text-blue-700">Phổ thông</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                            <div class="bg-blue-500 h-full rounded-full" style="width: 65%"></div>
-                        </div>
-                    </div>
-                    <div class="bg-white border border-slate-100 rounded p-2">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] font-extrabold text-slate-800">Tiếng Nhật</span>
-                            <span class="pill bg-blue-50 text-blue-700">Cơ bản</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                            <div class="bg-blue-500 h-full rounded-full" style="width: 30%"></div>
-                        </div>
-                    </div>
-                </div>
+            <div>
+              <strong class="text-slate-900 block font-bold">Ngôn ngữ:</strong>
+              <span class="text-slate-600 leading-tight block">JavaScript, TypeScript, C#, Java, SQL</span>
             </div>
-        </section>
-
-        <!-- ==================== NGƯỜI THAM CHIẾU (3 NGƯỜI, 1 HÀNG) ==================== -->
-        <section>
-            <h3 class="section-title">Người tham chiếu</h3>
-            <div class="grid grid-cols-3 gap-4">
-                <div class="bg-slate-50 rounded p-2.5 border border-slate-100">
-                    <p class="font-bold text-slate-900 text-[9.5px] leading-tight">ThS. Trần Thị Mỹ Phượng</p>
-                    <p class="text-[8.5px] text-blue-600 font-bold italic leading-relaxed">Giám đốc TT Kết nối Cộng đồng — UEF</p>
-                    <p class="text-[8.5px] text-slate-500 font-medium">phuongttm@uef.edu.vn</p>
-                </div>
-                <div class="bg-slate-50 rounded p-2.5 border border-slate-100">
-                    <p class="font-bold text-slate-900 text-[9.5px] leading-tight">ThS. Hoàng Văn Hiếu</p>
-                    <p class="text-[8.5px] text-blue-600 font-bold italic leading-relaxed">Giảng viên Khoa CNTT — UEF</p>
-                    <p class="text-[8.5px] text-slate-500 font-medium">hieuhv@uef.edu.vn</p>
-                </div>
-                <div class="bg-slate-50 rounded p-2.5 border border-slate-100">
-                    <p class="font-bold text-slate-900 text-[9.5px] leading-tight">Trương Đoàn Huỳnh Long</p>
-                    <p class="text-[8.5px] text-blue-600 font-bold italic leading-relaxed">Nhà sáng lập Astrodemy · Cố vấn</p>
-                    <p class="text-[8.5px] text-slate-500 font-medium"><a href="https://www.astrodemy.vn/about" target="_blank" class="hover:text-blue-600 hover:underline">astrodemy.vn/about</a></p>
-                </div>
+            <div>
+              <strong class="text-slate-900 block font-bold">Công cụ &amp; DevOps:</strong>
+              <span class="text-slate-600 leading-tight block">Git, Docker, Figma, Postman, A/B Testing, SEO</span>
             </div>
-        </section>
+          </div>
+        </div>
 
-        <!-- ==================== FOOTER ==================== -->
-        <footer class="border-t border-slate-100 pt-2 mt-auto flex justify-between items-center">
-            <p class="text-[7px] font-black text-slate-300 uppercase tracking-[0.3em]">Discipline is the DNA of success.</p>
-            <p class="text-[8px] font-black text-slate-400 uppercase tracking-tighter italic">phucphuc.id.vn</p>
-        </footer>
+        <!-- Event & Stage Skills -->
+        <div>
+          <h2 class="section-heading">Kỹ thuật Sân khấu &amp; AV</h2>
+          <div class="space-y-1 text-[10px] text-slate-600">
+            <div class="flex items-start gap-1.5">
+              <span class="text-emerald-600 font-bold">▸</span>
+              <span>Visual LED Mapping &amp; Display Control</span>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <span class="text-emerald-600 font-bold">▸</span>
+              <span>Live Sound Mixer &amp; Wireless Mics</span>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <span class="text-emerald-600 font-bold">▸</span>
+              <span>Lighting Cue &amp; Đường dây kịch bản</span>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <span class="text-emerald-600 font-bold">▸</span>
+              <span>Xử lý sự cố real-time dưới áp lực cao</span>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <span class="text-emerald-600 font-bold">▸</span>
+              <span>Nhạc cụ biểu diễn: Organ</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div>
+          <h2 class="section-heading">Học vấn</h2>
+          <div class="text-[10px]">
+            <strong class="text-slate-900 block font-bold">Đại học Kinh tế - Tài chính TP.HCM (UEF)</strong>
+            <span class="text-emerald-700 font-medium block">Cử nhân Công nghệ Phần mềm</span>
+            <span class="text-slate-500 font-mono text-[9px] block mt-0.5">Niên khóa: 2022 — 2026 (Tốt nghiệp)</span>
+          </div>
+        </div>
+
+        <!-- Languages -->
+        <div>
+          <h2 class="section-heading">Ngoại ngữ &amp; Kết nối</h2>
+          <div class="text-[10px] space-y-1 text-slate-600">
+            <div class="flex justify-between">
+              <span>Tiếng Anh:</span>
+              <strong class="text-slate-800">Giao tiếp phổ thông</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>Tiếng Nhật:</span>
+              <strong class="text-slate-800">Cơ bản</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>Zalo / WhatsApp:</span>
+              <strong class="text-emerald-700">0844.790.999</strong>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ================= RIGHT COLUMN ================= -->
+      <main class="col-span-8 space-y-3 pl-1">
+        
+        <!-- Work Experience -->
+        <div>
+          <h2 class="section-heading">Kinh nghiệm thực tế</h2>
+          
+          <!-- Job 1: Digiso Official (NEW!) -->
+          <div class="mb-2.5 p-2 rounded-lg bg-emerald-50/70 border border-emerald-200">
+            <div class="flex justify-between items-baseline">
+              <h3 class="font-kanit font-bold text-xs uppercase text-slate-900">
+                Lập trình viên chính thức (Official Software Developer)
+              </h3>
+              <span class="font-mono text-[9.5px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold">01/08/2026 — Hiện nay</span>
+            </div>
+            <div class="text-[10.5px] font-bold text-emerald-700 mb-0.5">
+              Công ty TNHH Giải pháp số Digiso
+            </div>
+            <p class="text-[10px] text-slate-700 leading-relaxed">
+              Chính thức gia nhập Digiso sau kỳ thực tập xuất sắc. Tham gia nghiên cứu và xây dựng các sản phẩm AI &amp; phần mềm chuyển đổi số trọng điểm: <strong>MADA AI Assistant</strong> (nền tảng trợ lý thông minh), <strong>FounderAI.biz</strong> và các dự án đối tác doanh nghiệp.
+            </p>
+          </div>
+
+          <!-- Job 2: Digiso Internship -->
+          <div class="mb-2.5">
+            <div class="flex justify-between items-baseline">
+              <h3 class="font-kanit font-bold text-[11px] uppercase text-slate-900">
+                Thực tập sinh Lập trình viên
+              </h3>
+              <span class="font-mono text-[9.5px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded">20/04/2026 — 20/07/2026</span>
+            </div>
+            <div class="text-[10px] font-bold text-emerald-600 mb-0.5">
+              Công ty TNHH Giải pháp số Digiso
+            </div>
+            <p class="text-[9.5px] text-slate-600 leading-snug">
+              Xây dựng nền tảng FounderAI.biz: Solo Frontend dựng Landing Page &amp; Dashboard, tích hợp Zalo OA, Email API và tối ưu Lighthouse 95+.
+            </p>
+          </div>
+
+          <!-- Job 3: CSL UEF -->
+          <div>
+            <div class="flex justify-between items-baseline">
+              <h3 class="font-kanit font-bold text-[11px] uppercase text-slate-900">
+                Trưởng ban Kỹ thuật &amp; Lập trình viên CSLUEF.com
+              </h3>
+              <span class="font-mono text-[9.5px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded">09/2022 — 04/2026 (4 năm)</span>
+            </div>
+            <div class="text-[10px] font-bold text-emerald-600 mb-0.5">
+              Trung tâm Kết nối cộng đồng UEF
+            </div>
+            <p class="text-[9.5px] text-slate-600 leading-snug">
+              <strong>Phần mềm:</strong> Xây dựng CSLUEF.com (React + .NET MVC 5 + SQL Server), số hóa quản trị 500+ sinh viên, tăng 60% hiệu suất. <strong>Sự kiện:</strong> Tổng chỉ huy kỹ thuật AV cho 20+ sự kiện (Vietnam Innovation Summit 2025, EA Summit...).
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Featured Projects -->
+        <div>
+          <h2 class="section-heading">Dự án phần mềm tiêu biểu</h2>
+
+          <div class="space-y-1.5">
+            
+            <!-- Project 1: MADA AI -->
+            <div class="p-1.5 rounded-lg border border-slate-200 bg-slate-50/70">
+              <div class="flex justify-between items-baseline">
+                <span class="font-kanit font-bold text-[10.5px] uppercase text-slate-900">
+                  1. MADA AI Assistant — Trợ lý AI thông minh cho doanh nghiệp
+                </span>
+                <span class="font-mono text-[8.5px] text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-bold">Digiso 2026</span>
+              </div>
+              <div class="text-[9px] font-mono text-slate-500">React · Vite · Tailwind CSS · AI Streaming · REST API</div>
+              <p class="text-[9.5px] text-slate-600 mt-0.5 leading-tight">
+                Xây dựng giao diện chat đa tính năng với cơ chế streaming thời gian thực, quản lý ngữ cảnh hội thoại và tối ưu tốc độ phản hồi.
+              </p>
+            </div>
+
+            <!-- Project 2: Tia Chớp Consult -->
+            <div class="p-1.5 rounded-lg border border-slate-200 bg-slate-50/70">
+              <div class="flex justify-between items-baseline">
+                <span class="font-kanit font-bold text-[10.5px] uppercase text-slate-900">
+                  2. Tia Chớp Consult — Dịch thuật công chứng, Visa &amp; Pháp lý trọn gói
+                </span>
+                <span class="font-mono text-[8.5px] text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-bold">Production</span>
+              </div>
+              <div class="text-[9px] font-mono text-slate-500">React · Next.js · Tailwind CSS · Framer Motion · SEO</div>
+              <p class="text-[9.5px] text-slate-600 mt-0.5 leading-tight">
+                Fullstack Web Developer: Thiết kế giao diện chuyển đổi cao (CRO), form nộp hồ sơ tự động hóa và tối ưu SEO chuẩn Lighthouse 95+.
+              </p>
+            </div>
+
+            <!-- Project 3: FounderAI.biz -->
+            <div class="p-1.5 rounded-lg border border-slate-200 bg-slate-50/70">
+              <div class="flex justify-between items-baseline">
+                <span class="font-kanit font-bold text-[10.5px] uppercase text-slate-900">
+                  3. FounderAI.biz — Đồng sáng lập AI Marketing qua Zalo &amp; Email
+                </span>
+                <span class="font-mono text-[8.5px] text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-bold">Digiso Product</span>
+              </div>
+              <div class="text-[9px] font-mono text-slate-500">React · Vite · Tailwind · Framer Motion · Tracking Pixel</div>
+              <p class="text-[9.5px] text-slate-600 mt-0.5 leading-tight">
+                Dựng landing page &amp; dashboard AI đa kênh. Tốc độ tải trang cao, tích hợp Zalo OA và A/B testing form thu thập lead.
+              </p>
+            </div>
+
+            <!-- Project 4: CSLUEF.com -->
+            <div class="p-1.5 rounded-lg border border-slate-200 bg-slate-50/70">
+              <div class="flex justify-between items-baseline">
+                <span class="font-kanit font-bold text-[10.5px] uppercase text-slate-900">
+                  4. CSLUEF.com — Nền tảng quản lý CLB &amp; Sinh viên Service-Learning
+                </span>
+                <span class="font-mono text-[8.5px] text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-bold">+60% Hiệu suất</span>
+              </div>
+              <div class="text-[9px] font-mono text-slate-500">React · .NET MVC 5 · SQL Server · Tailwind CSS</div>
+              <p class="text-[9.5px] text-slate-600 mt-0.5 leading-tight">
+                Số hóa toàn bộ quy trình đăng ký, điểm danh, phê duyệt dự án và báo cáo thống kê hoạt động cộng đồng của trường đại học.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+
     </div>
+
+    <!-- Footer Bar -->
+    <footer class="pt-2 border-t border-slate-200 flex justify-between items-center text-[8.5px] font-mono text-slate-400 uppercase tracking-widest">
+      <span>Nguyễn Hoàng Phúc · Official Software Developer @ Digiso · 2026</span>
+      <span>Live Portfolio: phucphuc.id.vn</span>
+    </footer>
+
+  </div>
 
 </body>
-
 </html>

@@ -1,756 +1,1735 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Mail, Code2, Headphones, FileText, X, Camera, Layout, ChevronRight, Images, ChevronLeft, Quote, ExternalLink, RefreshCw, Wifi, Eye, Maximize2 } from 'lucide-react';
+import { 
+  Github, Linkedin, Mail, Code2, X, 
+  ExternalLink, Check, Monitor, Radio,
+  ChevronRight, ArrowUpRight, Copy, Printer,
+  Maximize2, RefreshCw, Sparkles, Phone, MessageSquare,
+  Send, Globe2, Lock, Bot, ShieldCheck
+} from 'lucide-react';
 import { profile, projects, events, techStack } from './data';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.15 } }
-};
+// ========================================================
+// MADA AI ASSISTANT SIMULATOR (Live Interactive Conversational UI)
+// ========================================================
+function MadaAssistantSimulator({ project, lang, fullscreen = false, onToggleFullscreen }) {
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: 'mada',
+      text: lang === 'vi' 
+        ? 'Xin chào! Tôi là MADA AI Assistant từ Digiso. Tôi có thể hỗ trợ bạn tìm hiểu năng lực công nghệ, sản phẩm AI hoặc kết nối nhanh với Nguyễn Hoàng Phúc.' 
+        : 'Hello! I am MADA AI Assistant from Digiso. I can help you explore tech capabilities, AI products, or connect with Nguyen Hoang Phuc.'
+    }
+  ]);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
-};
+  const promptSuggestions = useMemo(() => [
+    {
+      q: lang === 'vi' ? '🚀 Hoàng Phúc làm gì tại Digiso?' : "🚀 What is Phuc's role at Digiso?",
+      a: lang === 'vi'
+        ? 'Nguyễn Hoàng Phúc là Software Developer chính thức tại Digiso từ 01/08/2026. Phúc trực tiếp xây dựng giao diện AI Chat Streaming cho MADA Assistant, nền tảng FounderAI.biz, và tích hợp các luồng tự động hóa tiếp thị qua Zalo OA & Email.'
+        : 'Nguyen Hoang Phuc is an Official Software Developer at Digiso (since August 2026). He engineers real-time streaming AI chat UI for MADA Assistant, FounderAI.biz, and automated Zalo & Email marketing funnels.'
+    },
+    {
+      q: lang === 'vi' ? '⚡ Điểm mạnh công nghệ của MADA AI?' : '⚡ Tech strengths of MADA AI?',
+      a: lang === 'vi'
+        ? 'MADA AI vận hành trên React 19 + Vite, Tailwind CSS và streaming token phản hồi mili-giây. Hệ thống tích hợp bảo mật doanh nghiệp, lưu trữ lịch sử hội thoại và tương thích mượt mà trên mobile.'
+        : 'MADA AI runs on React 19 + Vite with Tailwind CSS and sub-100ms real-time token streaming. Built with enterprise security compliance, session memory, and responsive UI.'
+    },
+    {
+      q: lang === 'vi' ? '💼 Dịch vụ của Digiso gồm những gì?' : '💼 Digiso enterprise services?',
+      a: lang === 'vi'
+        ? 'Digiso cung cấp giải pháp chuyển đổi số toàn diện: Trợ lý AI đàm thoại chuyên sâu (MADA), nền tảng marketing automation Zalo OA / Email (FounderAI), và thiết kế phần mềm doanh nghiệp tùy chỉnh.'
+        : 'Digiso provides comprehensive digital transformation: Conversational AI Assistants (MADA), multi-channel marketing automation (FounderAI), and custom enterprise software development.'
+    },
+    {
+      q: lang === 'vi' ? '📞 Kết nối nhanh với Phúc' : '📞 Contact Hoang Phuc',
+      a: lang === 'vi'
+        ? 'Bạn có thể kết nối ngay với Hoàng Phúc qua Hotline/Zalo: 0844 790 999, WhatsApp: +84 844 790 999, Telegram: @hoangphuc_capri hoặc Email: hoangphuc.capri.0501@gmail.com.'
+        : 'Reach Phuc via Phone/Zalo: 0844 790 999, WhatsApp: +84 844 790 999, Telegram: @hoangphuc_capri or Email: hoangphuc.capri.0501@gmail.com.'
+    }
+  ], [lang]);
 
-function LivePreview({ url, title }) {
-  const [loaded, setLoaded] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
-  const [retryCount, setRetryCount] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const handleSendPrompt = (question, answer) => {
+    if (isTyping) return;
+    setMessages(prev => [
+      ...prev,
+      { id: prev.length + 1, sender: 'user', text: question }
+    ]);
+    setIsTyping(true);
 
-  const statusLabel = useMemo(() => {
-    if (loaded) return 'Live preview đang hoạt động';
-    if (failed) return 'Live preview tạm không ổn định';
-    return retryCount > 0 ? 'Đang thử kết nối lại live preview' : 'Đang kết nối tới website trực tiếp';
-  }, [failed, loaded, retryCount]);
-
-  useEffect(() => {
-    setLoaded(false);
-    setFailed(false);
-    setReloadKey(0);
-    setRetryCount(0);
-    setIsFullscreen(false);
-  }, [url]);
-
-  useEffect(() => {
-    if (loaded || failed) return undefined;
-
-    const timer = setTimeout(() => {
-      if (retryCount < 1) {
-        setRetryCount((current) => current + 1);
-        setReloadKey((current) => current + 1);
-        return;
-      }
-
-      setFailed(true);
-    }, 15000);
-
-    return () => clearTimeout(timer);
-  }, [failed, loaded, reloadKey, retryCount]);
-
-  const reloadPreview = () => {
-    setFailed(false);
-    setLoaded(false);
-    setRetryCount(0);
-    setReloadKey((current) => current + 1);
+    setTimeout(() => {
+      setMessages(prev => [
+        ...prev, 
+        { id: prev.length + 2, sender: 'mada', text: answer }
+      ]);
+      setIsTyping(false);
+    }, 400);
   };
 
-  const Frame = ({ fullscreen = false }) => (
-    <div className={`relative ${fullscreen ? 'w-[min(92vw,1280px)] h-[85vh]' : 'w-full h-full'} bg-gradient-to-br from-slate-100 via-white to-slate-200 overflow-hidden`}>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.10),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.08),transparent_30%)]" />
+  const handleCustomSubmit = (e) => {
+    e.preventDefault();
+    if (!inputValue.trim() || isTyping) return;
+    const text = inputValue.trim();
+    setInputValue('');
+    
+    const matched = promptSuggestions.find(p => p.q.toLowerCase().includes(text.toLowerCase()) || text.toLowerCase().includes(p.q.toLowerCase()));
+    const reply = matched 
+      ? matched.a 
+      : (lang === 'vi' 
+          ? `MADA AI đã tiếp nhận câu hỏi của bạn: "${text}". Dự án MADA AI Assistant được Hoàng Phúc tối ưu với khả năng xử lý truy vấn AI real-time, giao diện thân thiện và kết nối API doanh nghiệp mượt mà.`
+          : `MADA AI received your query: "${text}". MADA AI Assistant was engineered by Hoang Phuc with real-time AI query handling, ultra-responsive UI, and robust enterprise API integration.`);
 
-      {!failed && (
-        <iframe
-          key={`${url}-${reloadKey}-${fullscreen ? 'fullscreen' : 'inline'}`}
-          src={url}
-          title={title}
-          className={`absolute inset-0 w-full h-full border-0 transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-          onLoad={() => {
-            setLoaded(true);
-            setFailed(false);
-          }}
-          onError={() => {
-            if (retryCount < 1) {
-              setRetryCount((current) => current + 1);
-              setReloadKey((current) => current + 1);
-              return;
-            }
+    handleSendPrompt(text, reply);
+  };
 
-            setFailed(true);
-          }}
-          referrerPolicy="strict-origin-when-cross-origin"
+  return (
+    <div className={`relative ${fullscreen ? 'w-[min(94vw,1200px)] h-[86vh]' : 'w-full h-full min-h-[480px] md:min-h-[540px]'} bg-[#050C07] rounded-2xl overflow-hidden flex flex-col border border-[#00DF82]/30 shadow-2xl`}>
+      {/* Top OS Window Bar */}
+      <div className="px-4 py-3 bg-[#030805] border-b border-[#E2F8EE]/10 flex items-center justify-between shrink-0 select-none">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-rose-500/80"></span>
+          <span className="w-3 h-3 rounded-full bg-amber-500/80"></span>
+          <span className="w-3 h-3 rounded-full bg-[#00DF82]/80"></span>
+          <div className="hidden sm:flex items-center gap-2 ml-3 px-3 py-1 rounded-full bg-[#08140E] border border-[#00DF82]/30 text-[11px] font-mono text-[#60FFAF]">
+            <Lock size={11} className="text-[#00DF82]" />
+            <span>mada.digiso.vn/chat</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-ping ml-1"></span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[#00DF82] px-2.5 py-0.5 rounded-full bg-[#00DF82]/10 border border-[#00DF82]/30 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-pulse"></span>
+            <span>Live Interactive Simulator</span>
+          </span>
+          <button
+            type="button"
+            onClick={onToggleFullscreen}
+            title={fullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}
+            className="p-1.5 rounded-lg text-[#E2F8EE]/60 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            {fullscreen ? <X size={15} /> : <Maximize2 size={13} />}
+          </button>
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Mở mada.digiso.vn"
+            className="p-1.5 rounded-lg text-[#00DF82] hover:text-[#60FFAF] hover:bg-[#00DF82]/10 transition-colors"
+          >
+            <ExternalLink size={13} />
+          </a>
+        </div>
+      </div>
+
+      {/* Chat App Header inside window */}
+      <div className="px-4 sm:px-6 py-3.5 bg-[#06120A] border-b border-[#00DF82]/15 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-[#00DF82]/15 border border-[#00DF82]/40 flex items-center justify-center p-1.5 overflow-hidden">
+            <img src={project.image} alt="MADA Logo" className="w-full h-full object-contain" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="font-kanit font-bold text-sm text-white tracking-wide">MADA AI Assistant</h4>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono uppercase bg-[#00DF82]/20 text-[#60FFAF] border border-[#00DF82]/30">v2.4 Enterprise</span>
+            </div>
+            <p className="text-[10px] text-[#E2F8EE]/60 font-mono">Digiso Technology · Stream Engine Active</p>
+          </div>
+        </div>
+
+        <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-[#E2F8EE]/50">
+          <Bot size={13} className="text-[#00DF82]" />
+          <span>Real-time Chat Simulation</span>
+        </div>
+      </div>
+
+      {/* Chat Message Scrollable Viewport */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 font-sans text-xs sm:text-sm">
+        {messages.map((msg) => (
+          <div 
+            key={msg.id} 
+            className={`flex items-start gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            {msg.sender === 'mada' && (
+              <div className="w-7 h-7 rounded-lg bg-[#00DF82]/20 border border-[#00DF82]/40 flex items-center justify-center shrink-0 p-1">
+                <img src={project.image} alt="MADA" className="w-full h-full object-contain" />
+              </div>
+            )}
+            <div 
+              className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 leading-relaxed ${
+                msg.sender === 'user'
+                  ? 'bg-gradient-to-r from-[#00DF82] to-[#60FFAF] text-black font-semibold shadow-md'
+                  : 'bg-[#08180E] border border-[#00DF82]/25 text-[#E2F8EE]'
+              }`}
+            >
+              {msg.text}
+            </div>
+          </div>
+        ))}
+
+        {isTyping && (
+          <div className="flex items-center gap-2 text-xs font-mono text-[#60FFAF] py-1">
+            <div className="w-7 h-7 rounded-lg bg-[#00DF82]/20 border border-[#00DF82]/40 flex items-center justify-center shrink-0 p-1">
+              <img src={project.image} alt="MADA" className="w-full h-full object-contain" />
+            </div>
+            <div className="px-3 py-2 rounded-xl bg-[#08180E] border border-[#00DF82]/20 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-bounce"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-bounce [animation-delay:0.2s]"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-bounce [animation-delay:0.4s]"></span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Suggested Quick Prompt Chips */}
+      <div className="px-4 py-2 bg-[#040A06] border-t border-[#E2F8EE]/5 overflow-x-auto flex items-center gap-2 no-scrollbar">
+        {promptSuggestions.map((item, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => handleSendPrompt(item.q, item.a)}
+            className="px-3 py-1 rounded-full bg-[#08180E] hover:bg-[#00DF82]/20 border border-[#00DF82]/30 hover:border-[#00DF82] text-[11px] text-[#60FFAF] hover:text-white transition-all whitespace-nowrap shrink-0"
+          >
+            {item.q}
+          </button>
+        ))}
+      </div>
+
+      {/* Chat Input Bar */}
+      <form onSubmit={handleCustomSubmit} className="p-3 sm:p-4 bg-[#030805] border-t border-[#00DF82]/20 flex items-center gap-2">
+        <input 
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder={lang === 'vi' ? 'Hỏi MADA AI về dự án hoặc Digiso...' : 'Ask MADA AI about the project or Digiso...'}
+          className="flex-1 bg-[#08180E] border border-[#00DF82]/25 focus:border-[#00DF82] rounded-xl px-4 py-2.5 text-xs text-white placeholder-[#E2F8EE]/40 outline-none transition-colors"
         />
-      )}
+        <button
+          type="submit"
+          disabled={!inputValue.trim() || isTyping}
+          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#00DF82] to-[#60FFAF] text-black font-bold text-xs flex items-center gap-1.5 hover:opacity-90 disabled:opacity-40 transition-all shadow-md shrink-0"
+        >
+          <span>{lang === 'vi' ? 'Gửi' : 'Send'}</span>
+          <Send size={13} />
+        </button>
+      </form>
+    </div>
+  );
+}
 
-      <div className={`absolute inset-0 z-10 p-6 md:p-8 flex flex-col justify-between transition-opacity duration-500 ${loaded && !failed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-rose-400" />
-            <span className="w-3 h-3 rounded-full bg-amber-400" />
-            <span className="w-3 h-3 rounded-full bg-emerald-400" />
+// ========================================================
+// INTERACTIVE BROWSER SHOWCASE (Guaranteed 100% Visuals + Iframe Test)
+// ========================================================
+function InteractiveBrowserShowcase({ project, lang, fullscreen = false, onToggleFullscreen }) {
+  const [viewMode, setViewMode] = useState('hd'); // 'hd' or 'iframe'
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  const cleanUrl = useMemo(() => {
+    return project.link ? project.link.replace(/^https?:\/\//, '') : '';
+  }, [project.link]);
+
+  return (
+    <div className={`relative ${fullscreen ? 'w-[min(94vw,1320px)] h-[88vh]' : 'w-full h-full min-h-[480px] md:min-h-[540px]'} bg-[#050C07] rounded-2xl overflow-hidden flex flex-col border border-[#00DF82]/30 shadow-2xl`}>
+      {/* OS Browser Bar */}
+      <div className="px-4 py-3 bg-[#030805] border-b border-[#E2F8EE]/10 flex items-center justify-between shrink-0 select-none">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-rose-500/80"></span>
+          <span className="w-3 h-3 rounded-full bg-amber-500/80"></span>
+          <span className="w-3 h-3 rounded-full bg-[#00DF82]/80"></span>
+
+          {/* Address Pill */}
+          <div className="hidden sm:flex items-center gap-2 ml-3 px-3 py-1 rounded-full bg-[#08140E] border border-[#00DF82]/30 text-[11px] font-mono text-[#60FFAF] max-w-xs truncate">
+            <Lock size={11} className="text-[#00DF82]" />
+            <span className="truncate">{cleanUrl}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-ping ml-1"></span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Live Preview
-            </div>
+        </div>
+
+        {/* View Mode Switcher + Actions */}
+        <div className="flex items-center gap-2">
+          {/* Mode Switcher */}
+          <div className="flex items-center bg-[#08140E] border border-[#00DF82]/25 rounded-full p-0.5 text-[10px] font-mono">
             <button
               type="button"
-              onClick={() => setIsFullscreen(true)}
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-300 transition-colors"
+              onClick={() => setViewMode('hd')}
+              className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${viewMode === 'hd' ? 'bg-[#00DF82] text-black font-extrabold shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
             >
-              <Maximize2 size={16} />
+              <ShieldCheck size={11} />
+              <span>{lang === 'vi' ? 'Chuẩn HD' : 'HD View'}</span>
             </button>
-          </div>
-        </div>
-
-        <div className="self-center w-full max-w-2xl rounded-[1.75rem] border border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_20px_60px_rgba(15,_23,_42,_0.10)] p-6 md:p-8 text-center">
-          <h3 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 mb-4">{title}</h3>
-          <p className="text-sm md:text-base text-slate-500 leading-relaxed mb-6">
-            {failed
-              ? 'Website này hiện không ổn định khi nhúng bằng iframe. Bạn có thể tải lại hoặc mở website trực tiếp ở tab mới.'
-              : 'Portfolio đang giữ chế độ live preview hoàn toàn. Nếu website phản hồi chậm, hệ thống sẽ tự thử lại một lần.'}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
-              onClick={reloadPreview}
-              className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600 transition-colors"
+              onClick={() => setViewMode('iframe')}
+              className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${viewMode === 'iframe' ? 'bg-[#00DF82] text-black font-extrabold shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
             >
-              <RefreshCw size={16} /> Tải lại live preview
+              <Monitor size={11} />
+              <span>{lang === 'vi' ? 'Thử Iframe' : 'Live Iframe'}</span>
             </button>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-blue-50 text-blue-700 text-sm font-bold border border-blue-100 hover:bg-blue-100 transition-colors"
-            >
-              <ExternalLink size={16} /> Mở website
-            </a>
           </div>
-        </div>
 
-        <div className="flex items-center justify-between gap-4 text-[11px] text-slate-500 font-medium">
-          <span>{statusLabel}</span>
-          {!failed ? (
-            <div className="flex items-center gap-2 text-blue-600">
-              {!loaded && <div className="w-5 h-5 border-[3px] border-blue-200 border-t-blue-600 rounded-full animate-spin" />}
-              <span>{loaded ? 'Connected' : retryCount === 0 ? 'Loading' : 'Retrying once'}</span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
-              <Wifi size={14} />
-              <span>Unavailable in iframe</span>
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={onToggleFullscreen}
+            title={fullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}
+            className="p-1.5 rounded-lg text-[#E2F8EE]/60 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            {fullscreen ? <X size={15} /> : <Maximize2 size={13} />}
+          </button>
+
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Mở tab mới"
+            className="p-1.5 rounded-lg text-[#00DF82] hover:text-[#60FFAF] hover:bg-[#00DF82]/10 transition-colors"
+          >
+            <ExternalLink size={13} />
+          </a>
         </div>
+      </div>
+
+      {/* Main Viewport */}
+      <div className="relative flex-1 w-full h-full bg-[#040806] overflow-hidden flex flex-col">
+        {viewMode === 'hd' ? (
+          /* HD Image Showcase with Interactive HUD */
+          <div className="relative flex-1 w-full h-full overflow-y-auto group">
+            {/* Project Screenshot Banner */}
+            <div className="relative w-full min-h-full">
+              <img 
+                src={project.image} 
+                alt={project.title}
+                className="w-full h-auto object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#040806] via-transparent to-transparent opacity-80 pointer-events-none"></div>
+            </div>
+
+            {/* Floating Top Badge */}
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-[#040806]/85 backdrop-blur-md border border-[#00DF82]/40 text-[#60FFAF] text-[10px] font-mono flex items-center gap-1.5 shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-[#00DF82] animate-ping"></span>
+                <span>HTTPS · Production 2026</span>
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#040806]/85 backdrop-blur-md border border-[#E2F8EE]/15 text-[#E2F8EE]/80 text-[10px] font-mono hidden sm:inline-block">
+                ⚡ Lighthouse 95+
+              </span>
+            </div>
+
+            {/* Bottom Floating Interactive HUD */}
+            <div className="absolute bottom-4 left-4 right-4 z-10 p-4 rounded-2xl bg-[#050E08]/90 backdrop-blur-md border border-[#00DF82]/30 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
+              <div>
+                <span className="text-[10px] font-mono uppercase text-[#00DF82] tracking-wider block">
+                  {lang === 'vi' ? 'Sản phẩm triển khai thực tế' : 'Live Production Showcase'}
+                </span>
+                <h4 className="font-kanit font-black text-white text-base sm:text-lg">{project.title}</h4>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  {project.highlights?.map((hl, hIdx) => (
+                    <span key={hIdx} className="px-2 py-0.5 rounded-md bg-[#00DF82]/10 text-[#60FFAF] text-[10px] font-mono border border-[#00DF82]/20">
+                      {hl[lang]}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shine-btn text-black font-extrabold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full flex items-center gap-2 shadow-lg"
+                >
+                  <span>{lang === 'vi' ? 'Mở Website Trực Tiếp' : 'Launch Website'}</span>
+                  <ArrowUpRight size={14} className="stroke-[2.5]" />
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Live Iframe Mode with Safeguard */
+          <div className="relative flex-1 w-full h-full flex flex-col">
+            <iframe
+              src={project.link}
+              title={project.title}
+              className={`w-full flex-1 border-0 ${iframeLoaded ? 'opacity-100' : 'opacity-30'} transition-opacity duration-300`}
+              onLoad={() => setIframeLoaded(true)}
+              onError={() => setIframeLoaded(false)}
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            />
+
+            {/* Iframe Safeguard Notice */}
+            <div className="p-3 bg-[#06120A] border-t border-[#00DF82]/20 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+              <div className="flex items-center gap-2 text-[#E2F8EE]/70">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-pulse"></span>
+                <span>
+                  {lang === 'vi'
+                    ? 'Chế độ Iframe trực tiếp. Nếu website chặn nhúng (CSP/X-Frame-Options), màn hình có thể trắng.'
+                    : 'Live Iframe mode. If blocked by remote CSP/X-Frame-Options, iframe may appear blank.'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('hd')}
+                  className="px-3 py-1 rounded-full bg-[#00DF82]/20 text-[#60FFAF] border border-[#00DF82]/40 text-[11px] font-bold hover:bg-[#00DF82] hover:text-black transition-colors"
+                >
+                  {lang === 'vi' ? 'Quay về Chuẩn HD' : 'Switch to HD View'}
+                </button>
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 rounded-full bg-[#00DF82] text-black font-black text-[11px] flex items-center gap-1 hover:bg-[#60FFAF] transition-colors"
+                >
+                  <span>{lang === 'vi' ? 'Mở Web' : 'Open'}</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+// ========================================================
+// UNIFIED PROJECT SHOWCASE WINDOW (Handles Fullscreen & Routing)
+// ========================================================
+function ProjectShowcaseWindow({ project, lang }) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   return (
-    <>
-      <Frame />
+    <div className="relative w-full h-full">
+      {project.type === 'ai-assistant' ? (
+        <MadaAssistantSimulator 
+          project={project} 
+          lang={lang} 
+          fullscreen={false} 
+          onToggleFullscreen={() => setIsFullscreen(true)} 
+        />
+      ) : (
+        <InteractiveBrowserShowcase 
+          project={project} 
+          lang={lang} 
+          fullscreen={false} 
+          onToggleFullscreen={() => setIsFullscreen(true)} 
+        />
+      )}
 
+      {/* Fullscreen Overlay */}
       <AnimatePresence>
         {isFullscreen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[80] bg-slate-950/80 backdrop-blur-md p-4 md:p-8 flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-[#040806]/95 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6"
             onClick={() => setIsFullscreen(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              transition={{ duration: 0.25 }}
-              className="relative"
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
+              className="relative"
             >
-              <button
-                type="button"
-                onClick={() => setIsFullscreen(false)}
-                className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/90 text-slate-900 shadow-lg flex items-center justify-center hover:bg-white transition-colors"
-              >
-                <X size={20} />
-              </button>
-              <Frame fullscreen />
+              {project.type === 'ai-assistant' ? (
+                <MadaAssistantSimulator 
+                  project={project} 
+                  lang={lang} 
+                  fullscreen={true} 
+                  onToggleFullscreen={() => setIsFullscreen(false)} 
+                />
+              ) : (
+                <InteractiveBrowserShowcase 
+                  project={project} 
+                  lang={lang} 
+                  fullscreen={true} 
+                  onToggleFullscreen={() => setIsFullscreen(false)} 
+                />
+              )}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
 
-function App() {
-  const [activeView, setActiveView] = useState('developer');
-
-  // State mới cho Event Gallery Modal
+// ========================================================
+// MAIN APPLICATION COMPONENT (With Bilingual VI / EN Support)
+// ========================================================
+export default function App() {
+  const [lang, setLang] = useState('vi'); // 'vi' or 'en'
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const [copiedType, setCopiedType] = useState(null);
+  const [isCvOpen, setIsCvOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const nextImage = (e) => {
-    e.stopPropagation();
-    setActiveImageIndex((prev) => (prev === selectedEvent.images.length - 1 ? 0 : prev + 1));
+  const [eventFilter, setEventFilter] = useState('all');
+
+  // 1. Scroll progress
+  useEffect(() => {
+    const handleScroll = () => {
+      const winScroll = document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      setScrollProgress(winScroll / height);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // 2. Mouse spotlight
+  useEffect(() => {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // 3. Copy handler
+  const handleCopy = (text, type) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedType(type);
+      setTimeout(() => setCopiedType(null), 2000);
+    });
   };
 
-  const prevImage = (e) => {
-    e.stopPropagation();
-    setActiveImageIndex((prev) => (prev === 0 ? selectedEvent.images.length - 1 : prev - 1));
-  };
+  // 4. Events filter
+  const filteredEvents = useMemo(() => {
+    if (eventFilter === 'all') return events;
+    if (eventFilter === 'featured') return events.slice(0, 6);
+    return events.filter(e => e.year === eventFilter);
+  }, [eventFilter]);
+
+  // Dictionary for UI static text
+  const t = useMemo(() => {
+    return {
+      vi: {
+        navAbout: 'Về tôi',
+        navProjects: 'Dự án Live',
+        navEvents: 'Sân khấu & AV',
+        navExperience: 'Kinh nghiệm',
+        navContact: 'Liên hệ',
+        openToWork: 'Lập trình viên Digiso',
+        viewCvBtn: 'Xem CV A4',
+        heroEyebrow: 'WHERE CODE MEETS THE STAGE · PORTFOLIO 2026',
+        heroTagline: 'Kỹ sư phần mềm tốt nghiệp UEF, hiện là Lập trình viên chính thức tại Digiso. Đam mê biến ý tưởng thành sản phẩm số thật từ nền tảng AI thông minh đến web fullstack. Bên cạnh code, vận hành kỹ thuật âm thanh - ánh sáng - LED cho 20+ sự kiện 1000+ người với tư duy Zero-Downtime.',
+        exploreProjects: 'Khám phá 5 Dự án Live',
+        exploreEvents: 'Show Sân khấu & AV',
+        metric1Num: 'DIGISO',
+        metric1Sub: 'Lập trình viên chính thức',
+        metric2Num: '20+ Show',
+        metric2Sub: 'Sự kiện quy mô 50 - 1000+ người',
+        metric3Num: '60% Hiệu suất',
+        metric3Sub: 'Tối ưu hóa với CSLUEF.com',
+        metric4Num: '95+ Điểm',
+        metric4Sub: 'Lighthouse Performance',
+        capSectionTitle: '01 / THẾ MẠNH ĐỘC BẢN',
+        capHeading: 'HAI MẶT CỦA MỘT BẢN THỂ',
+        capDesc: 'Sự hòa quyện giữa tư duy logic của Kỹ sư phần mềm và phản xạ nhạy bén tính bằng mili-giây của Tổng chỉ huy kỹ thuật sân khấu.',
+        devPillarTitle: 'The Code Crafter',
+        devPillarDesc: 'Tốt nghiệp Kỹ thuật Phần mềm UEF. Lập trình viên chính thức tại Digiso, tham gia phát triển MADA AI Assistant, FounderAI.biz và các nền tảng số hóa. Tập trung UI chuyển đổi cao, tối ưu Lighthouse 95+ và kiến trúc Backend ổn định.',
+        stagePillarTitle: 'The Stage Conductor',
+        stagePillarDesc: '4 năm cống hiến giữ chức vụ Trưởng ban Kỹ thuật Trung tâm Kết nối cộng đồng UEF. Chỉ huy kỹ thuật âm thanh, ánh sáng, màn hình LED và visual cho 20+ sự kiện tầm cỡ. Rèn luyện bản lĩnh xử lý sự cố trực tiếp dưới áp lực nghẹt thở.',
+        projectsSectionTitle: '02 / FEATURED WORK',
+        projectsHeading: '5 DỰ ÁN LIVE PREVIEW (LUÔN BẬT)',
+        projectsDesc: 'Tất cả các sản phẩm số đều đang chạy trực tiếp trên môi trường production, bạn có thể lướt và tương tác ngay trên khung mô phỏng.',
+        openNewTab: 'Mở Tab Mới',
+        productDesc: 'Mô tả sản phẩm',
+        techStackLabel: 'Tech Stack',
+        statusActive: '● Production Active',
+        perfScore: 'Lighthouse 95+',
+        responsiveAll: '100% Mobile & PC',
+        visitDirectly: 'Truy cập trực tiếp',
+        eventsSectionTitle: '03 / BEHIND THE STAGE',
+        eventsHeading: 'SÂN KHẤU, ÁNH SÁNG & AV THỰC CHIẾN',
+        eventsDesc: '20+ sự kiện quy mô từ 50 đến 1000+ người trong suốt 4 năm phụ trách kỹ thuật.',
+        filterAll: `Tất cả (${events.length})`,
+        filterFeatured: 'Tiêu biểu (6)',
+        filter2026: 'Năm 2026',
+        filter2025: 'Năm 2025',
+        filter2024: 'Năm 2024',
+        viewPhotos: 'Xem ảnh',
+        timelineSectionTitle: '04 / TIMELINE',
+        timelineHeading: 'KINH NGHIỆM THỰC CHIẾN',
+        arsenalSectionTitle: '05 / ARSENAL',
+        arsenalHeading: 'KỸ NĂNG & VŨ KHÍ CÔNG NGHỆ',
+        contactSectionTitle: 'Ready for full-time role & high-impact projects',
+        contactHeading: "LET'S TALK",
+        directEmail: 'Direct Email',
+        phoneZalo: 'Phone / Zalo',
+        chatWhatsApp: 'Chat qua WhatsApp',
+        chatTelegram: 'Chat qua Telegram',
+        copyright: 'Nguyễn Hoàng Phúc · Portfolio 2026',
+        copyrightRole: 'Software Developer · Digiso Official · Event Technical Director',
+        cvModalTitle: 'CURRICULUM VITAE · HOÀNG PHÚC',
+        printCv: 'In / Tải PDF',
+        summaryHeading: 'Tóm tắt năng lực',
+        progSkillsHeading: 'Kỹ năng Lập trình',
+        stageSkillsHeading: 'Kỹ thuật Sân khấu',
+        eduHeading: 'Học vấn',
+        workExpHeading: 'Kinh nghiệm thực tế',
+        featuredProjHeading: 'Dự án tiêu biểu',
+      },
+      en: {
+        navAbout: 'About',
+        navProjects: 'Live Projects',
+        navEvents: 'Stage & AV',
+        navExperience: 'Experience',
+        navContact: 'Contact',
+        openToWork: 'Software Developer @ Digiso',
+        viewCvBtn: 'View A4 CV',
+        heroEyebrow: 'WHERE CODE MEETS THE STAGE · PORTFOLIO 2026',
+        heroTagline: 'Software Engineering Graduate from UEF, currently an Official Software Developer at Digiso. Passionate about shipping real digital products, from intelligent conversational AI to high-performing fullstack platforms. Simultaneously commanding live AV, sound, and stage LED for 20+ mega shows with a Zero-Downtime mindset.',
+        exploreProjects: 'Explore 5 Live Projects',
+        exploreEvents: 'Live Shows & AV',
+        metric1Num: 'DIGISO',
+        metric1Sub: 'Official Software Developer',
+        metric2Num: '20+ Shows',
+        metric2Sub: 'Live events (50 to 1,000+ pax)',
+        metric3Num: '60% Efficiency',
+        metric3Sub: 'Optimized via CSLUEF.com',
+        metric4Num: '95+ Score',
+        metric4Sub: 'Google Lighthouse Performance',
+        capSectionTitle: '01 / CORE DUAL CAPABILITY',
+        capHeading: 'TWO SIDES OF ONE IDENTITY',
+        capDesc: 'The synergy between structured software engineering logic and split-second crisis instincts of a live stage technical director.',
+        devPillarTitle: 'The Code Crafter',
+        devPillarDesc: 'Software Engineering graduate from UEF. Full-time developer at Digiso, building MADA AI Assistant, FounderAI.biz, and business digitization platforms with high conversion UX and 95+ Lighthouse scores.',
+        stagePillarTitle: 'The Stage Conductor',
+        stagePillarDesc: '4 years dedicated as Head of Technical Team at UEF Community Center. Directed audio, lighting, and real-time LED mapping for 20+ large-scale events under intense live production pressure.',
+        projectsSectionTitle: '02 / FEATURED WORK',
+        projectsHeading: '5 LIVE PREVIEWS (ALWAYS ON)',
+        projectsDesc: 'All digital products are running live on production environments. You can scroll, test, and interact right inside the simulated frames.',
+        openNewTab: 'Open In New Tab',
+        productDesc: 'Product Overview',
+        techStackLabel: 'Tech Stack',
+        statusActive: '● Production Active',
+        perfScore: 'Lighthouse 95+',
+        responsiveAll: '100% Mobile & PC',
+        visitDirectly: 'Visit live project',
+        eventsSectionTitle: '03 / BEHIND THE STAGE',
+        eventsHeading: 'STAGE PRODUCTION & LIVE AV ARCHIVE',
+        eventsDesc: '20+ live conferences, summits, and festivals (50 to 1,000+ audience capacity) across 4 years of technical leadership.',
+        filterAll: `All (${events.length})`,
+        filterFeatured: 'Featured (6)',
+        filter2026: 'Year 2026',
+        filter2025: 'Year 2025',
+        filter2024: 'Year 2024',
+        viewPhotos: 'View Photos',
+        timelineSectionTitle: '04 / TIMELINE',
+        timelineHeading: 'PRACTICAL EXPERIENCE',
+        arsenalSectionTitle: '05 / ARSENAL',
+        arsenalHeading: 'TECHNICAL SKILLS & TOOLS',
+        contactSectionTitle: 'Ready for full-time role & high-impact projects',
+        contactHeading: "LET'S TALK",
+        directEmail: 'Direct Email',
+        phoneZalo: 'Phone / Zalo',
+        chatWhatsApp: 'Chat on WhatsApp',
+        chatTelegram: 'Chat on Telegram',
+        copyright: 'Nguyen Hoang Phuc · Portfolio 2026',
+        copyrightRole: 'Software Developer · Digiso Official · Event Technical Director',
+        cvModalTitle: 'CURRICULUM VITAE · HOANG PHUC',
+        printCv: 'Print / Save PDF',
+        summaryHeading: 'Executive Summary',
+        progSkillsHeading: 'Software Engineering',
+        stageSkillsHeading: 'Live Event & AV',
+        eduHeading: 'Education',
+        workExpHeading: 'Professional Experience',
+        featuredProjHeading: 'Featured Projects',
+      }
+    }[lang];
+  }, [lang]);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-600 overflow-x-hidden">
+    <div className="bg-[#040806] text-[#E2F8EE] font-sans antialiased selection:bg-[#00DF82] selection:text-black relative overflow-x-hidden min-h-screen">
+      
+      {/* Mouse Glow Spotlight */}
+      <div 
+        className="pointer-events-none fixed w-[600px] h-[600px] rounded-full blur-3xl z-1 hidden md:block transition-transform duration-75 ease-out"
+        style={{
+          left: `${mousePos.x}px`,
+          top: `${mousePos.y}px`,
+          transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(0, 223, 130, 0.12) 0%, rgba(5, 122, 68, 0.04) 40%, transparent 70%)'
+        }}
+      />
 
-      {/* Background Decor */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-200/30 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[120px]"></div>
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]"></div>
+      {/* Top Progress Bar */}
+      <div 
+        className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#032B18] via-[#00DF82] to-[#60FFAF] z-50 origin-left transition-transform duration-75"
+        style={{ transform: `scaleX(${scrollProgress})` }}
+      />
+
+      {/* Floating Header Navigation */}
+      <header className="fixed top-5 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
+        <nav className="glass-panel px-4 sm:px-6 py-3 rounded-full flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+          
+          <a href="#hero" className="flex items-center gap-2 group">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#00DF82] group-hover:scale-125 transition-transform shadow-[0_0_12px_#00DF82]"></span>
+            <span className="font-kanit font-black tracking-wider text-lg uppercase text-white group-hover:text-[#60FFAF] transition-colors">
+              HP<span className="text-[#00DF82]">.DEV</span>
+            </span>
+          </a>
+
+          <div className="hidden md:flex items-center gap-6 text-xs uppercase tracking-[0.2em] font-medium text-[#E2F8EE]/70">
+            <a href="#about" className="hover:text-white transition-colors">{t.navAbout}</a>
+            <a href="#projects" className="hover:text-white transition-colors">{t.navProjects}</a>
+            <a href="#events" className="hover:text-white transition-colors">{t.navEvents}</a>
+            <a href="#experience" className="hover:text-white transition-colors">{t.navExperience}</a>
+            <a href="#contact" className="hover:text-white transition-colors">{t.navContact}</a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            
+            {/* Language Switcher Pill */}
+            <div className="flex items-center bg-[#040806]/80 border border-[#E2F8EE]/15 rounded-full p-0.5 text-[11px] font-mono">
+              <button
+                type="button"
+                onClick={() => setLang('vi')}
+                className={`px-2.5 py-1 rounded-full transition-all ${lang === 'vi' ? 'bg-[#00DF82] text-black font-black shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
+              >
+                VI
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang('en')}
+                className={`px-2.5 py-1 rounded-full transition-all ${lang === 'en' ? 'bg-[#00DF82] text-black font-black shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
+              >
+                EN
+              </button>
+            </div>
+
+            {/* Status indicator */}
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-[#00DF82]/10 border border-[#00DF82]/25 text-[#60FFAF] text-[11px] font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-ping"></span>
+              <span>{t.openToWork}</span>
+            </div>
+
+            <button 
+              onClick={() => setIsCvOpen(true)}
+              className="shine-btn text-black text-xs uppercase tracking-widest font-black px-4 sm:px-5 py-2.5 rounded-full flex items-center gap-2"
+            >
+              <span>{t.viewCvBtn}</span>
+              <ArrowUpRight size={14} className="stroke-[2.5]" />
+            </button>
+          </div>
+
+        </nav>
+      </header>
+
+      {/* Ambient Stage Light Background Gradients */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-[#057A44]/20 rounded-full blur-[140px]"></div>
+        <div className="absolute top-[40%] -left-40 w-[600px] h-[600px] bg-[#032B18]/35 rounded-full blur-[160px]"></div>
+        <div className="absolute bottom-10 right-0 w-[700px] h-[600px] bg-[#00DF82]/10 rounded-full blur-[150px]"></div>
       </div>
 
-      {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 border-b border-slate-200/50 bg-white/70 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            PHUC.DEV
-          </span>
-          <div className="flex bg-slate-100 p-1 rounded-full shadow-inner border border-slate-200">
-            <button
-              onClick={() => setActiveView('developer')}
-              className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${activeView === 'developer' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
-            >
-              <Code2 size={16} /> Software
-            </button>
-            <button
-              onClick={() => setActiveView('event')}
-              className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${activeView === 'event' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
-            >
-              <Headphones size={16} /> Event Tech
-            </button>
-          </div>
-        </div>
-      </nav>
+      <main className="relative z-10">
 
-      <main className="relative z-10 max-w-[90rem] mx-auto px-6 pt-32 md:pt-40">
-        <div className={`${activeView === 'developer' ? 'block' : 'hidden'}`}>
-          {/* =========================================
-              TRANG 1: Web Developer (Giữ nguyên)
-              ========================================= */}
-          <motion.div animate={{ opacity: activeView === 'developer' ? 1 : 0, x: activeView === 'developer' ? 0 : -20 }} transition={{ duration: 0.3 }}>
-              {/* =========================================
-    HERO SECTION: THE "DISCIPLINE" ENGINEER
-    ========================================= */}
-              <section id="home" className="min-h-[90vh] flex flex-col md:flex-row items-center justify-between gap-12 py-20 relative">
-
-                {/* CỘT TRÁI: NỘI DUNG CHỮ */}
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="flex-1 text-center md:text-left z-10"
-                >
-                  {/* Status Badge */}
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm mb-8">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
-                    </span>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                      Software Developer • Digiso · UEF Alumni
-                    </span>
-                  </div>
-
-                  {/* Main Headline */}
-                  <h1 className="text-6xl md:text-8xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.85]">
-                    Nguyễn Hoàng <br />
-                    <span className="text-blue-600">Phúc.</span>
-                  </h1>
-
-                  {/* Sub-headline & Quote */}
-                  <div className="max-w-xl">
-                    <p className="text-lg md:text-xl text-slate-500 mb-8 leading-relaxed font-medium">
-                      Xin chào, mình là <span className="text-slate-900 font-bold italic">Hoàng Phúc</span>. Một lập trình viên Gen Z sinh năm 2004, chuyên tâm vào <span className="text-slate-900">Web Development</span> và vận hành <span className="text-slate-900 underline decoration-blue-500/30">Kỹ thuật Sự kiện</span>.
-                    </p>
-
-                    {/* Quote nổi bật từ bài báo */}
-                    <div className="border-l-4 border-blue-500 pl-6 py-2 mb-10 bg-blue-50/50 rounded-r-2xl">
-                      <p className="text-sm md:text-base italic text-slate-600 font-semibold leading-relaxed">
-                        "Mình làm việc dựa trên <span className="text-blue-600">kỷ luật</span> chứ không phải bằng động lực."
-                      </p>
-                      <a
-                        href="https://www.uef.edu.vn/servicelearning/phan-hoi-cua-sinh-vien/nguyen-hoang-phuc-minh-lam-viec-dua-tren-ky-luat-chu-khong-phai-bang-dong-luc-25844"
-                        target="_blank"
-                        className="text-[10px] uppercase font-black text-blue-400 mt-2 block hover:text-blue-600 transition tracking-widest"
-                      >
-                        — Read Featured Article on UEF News ↗
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Call to Action Buttons */}
-                  <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                    <a href={`mailto:${profile.social.email}`} className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 transition shadow-xl shadow-slate-200 hover:-translate-y-1 flex items-center gap-2">
-                      <Mail size={18} /> Kết nối với mình
-                    </a>
-                    <a href="/CV_HoangPhuc.html" target="_blank" className="px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition shadow-sm flex items-center gap-2">
-                      <FileText size={18} /> Xem CV chi tiết
-                    </a>
-                  </div>
-                </motion.div>
-
-                {/* CỘT PHẢI: HÌNH ẢNH CÁ NHÂN (ĐÃ FIX LỖI MẤT ĐẦU) */}
-                <motion.div
+        {/* ======================================================== */}
+        {/* HERO SECTION: MASSIVE TYPOGRAPHY + AVATAR PHOTO          */}
+        {/* ======================================================== */}
+        <section id="hero" className="relative min-h-screen pt-36 pb-20 px-5 sm:px-8 md:px-12 flex flex-col justify-between cyber-grid-bg">
+          
+          <div className="max-w-6xl mx-auto w-full pt-4">
+            
+            <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center mb-16">
+              
+              {/* Left Column: Text & Hero Info */}
+              <div className="lg:col-span-8">
+                <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                  className="flex-1 relative flex justify-center items-end md:items-center min-h-[400px] md:min-h-[600px]"
+                  transition={{ duration: 0.6 }}
+                  className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#E2F8EE]/15 bg-[#E2F8EE]/5 backdrop-blur-sm text-xs font-mono tracking-widest uppercase text-[#60FFAF] mb-6"
                 >
-                  {/* Decor Background (Hình khối phía sau) */}
-                  <div className="absolute w-72 h-72 md:w-[450px] md:h-[450px] bg-gradient-to-tr from-blue-500/10 to-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
-
-                  {/* Khung trắng bo góc (Nên đẩy thấp xuống một chút để đầu bạn vượt lên trên) */}
-                  <div className="absolute w-64 h-80 md:w-96 md:h-[500px] bg-white border border-slate-100 shadow-2xl rounded-[4rem] rotate-3 translate-y-10 hidden md:block"></div>
-
-                  {/* Container chứa ảnh (Quan trọng: Không để overflow-hidden ở đây) */}
-                  <div className="relative z-10 w-full max-w-[320px] md:max-w-[480px] flex justify-center items-end">
-                    <img
-                      src="/avatar.png"
-                      alt="Nguyễn Hoàng Phúc - Senna"
-                      className="w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:scale-[1.03] transition-transform duration-500"
-                      style={{
-                        marginBottom: "-20px", // Đẩy chân ảnh xuống sát mép
-                        maxHeight: "110%"     // Cho phép ảnh cao hơn container một chút
-                      }}
-                    />
-
-                    {/* Floating Badge 1 (Software) - ĐẨY LÊN CAO VÀ RA NGOÀI BIÊN PHẢI */}
-                    <motion.div
-                      animate={{ y: [0, -15, 0] }}
-                      transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                      className="absolute -right-16 top-0 md:-right-24 md:top-5 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-100 z-20 hidden lg:block"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-50 text-blue-600 rounded-xl shadow-inner"><Code2 size={24} /></div>
-                        <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Specializing in</p>
-                          <p className="text-sm font-bold text-slate-800 tracking-tight">Web Developer</p>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Floating Badge 2 (Event) - ĐẨY XUỐNG THẤP VÀ RA NGOÀI BIÊN TRÁI */}
-                    <motion.div
-                      animate={{ y: [0, 15, 0] }}
-                      transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
-                      className="absolute -left-16 bottom-10 md:-left-28 md:bottom-20 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-100 z-20 hidden lg:block"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-rose-50 text-rose-600 rounded-xl shadow-inner"><Headphones size={24} /></div>
-                        <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Expertise in</p>
-                          <p className="text-sm font-bold text-slate-800 tracking-tight">Event Technical</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
+                  <span className="w-2 h-2 rounded-full bg-[#00DF82] animate-pulse"></span>
+                  {t.heroEyebrow}
                 </motion.div>
 
-              </section>
-
-              {/* Tech Stack */}
-              <motion.section initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }} variants={containerVariants} className="py-16 border-t border-slate-200/60">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-10">Vũ khí công nghệ</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                  {techStack.map((stack, i) => (
-                    <motion.div key={i} variants={itemVariants} className="group">
-                      <h4 className="text-blue-600 font-bold mb-4 text-[10px] uppercase tracking-widest flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 group-hover:scale-150 transition-transform"></div>
-                        {stack.category}
-                      </h4>
-                      <div className="flex flex-col gap-2">
-                        {stack.items.map((item, j) => (
-                          <span key={j} className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">{item}</span>
-                        ))}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.section>
-
-              {/* Work Experience & Languages */}
-              <section className="py-16 border-t border-slate-200/60">
-                <div className="grid md:grid-cols-5 gap-10">
-                  {/* Cột kinh nghiệm làm việc */}
-                  <div className="md:col-span-3">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Kinh nghiệm làm việc</h3>
-
-                    {/* Thực tập */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5 }}
-                      className="relative pl-8 pb-8 border-l-2 border-blue-500"
-                    >
-                      <div className="absolute w-4 h-4 bg-blue-500 rounded-full -left-[9px] top-1 ring-4 ring-blue-100"></div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-                        {profile.internship.duration}
-                      </span>
-                      <h4 className="text-xl font-bold text-slate-900 mt-3 mb-1">{profile.internship.title}</h4>
-                      <p className="text-slate-500 font-semibold mb-3">{profile.internship.company}</p>
-                      <p className="text-slate-500 font-medium leading-relaxed">
-                        Hoàn thành {profile.internship.months} thực tập tại Digiso. {profile.internship.note}. Tham gia trực tiếp vào các dự án phát triển sản phẩm số và quy trình vận hành thực tế.
-                      </p>
-                    </motion.div>
-
-                    {/* UEF Experience */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: 0.1 }}
-                      className="relative pl-8 border-l-2 border-slate-200"
-                    >
-                      <div className="absolute w-4 h-4 bg-white border-4 border-slate-300 rounded-full -left-[9px] top-1"></div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        {profile.uefExperience.duration}
-                      </span>
-                      <h4 className="text-lg font-bold text-slate-700 mt-3 mb-1">{profile.uefExperience.title}</h4>
-                      <p className="text-slate-500 font-semibold mb-3">{profile.uefExperience.company}</p>
-                      <p className="text-slate-500 font-medium leading-relaxed italic mb-4">
-                        Suốt gần 4 năm đại học, vừa cầm micro cầm mixer, vừa cầm bàn phím gõ code. Hai mảng nghe tách biệt, nhưng cùng chung một tư duy: <strong>làm cho mọi thứ vận hành trơn tru</strong>.
-                      </p>
-                      <div className="grid grid-cols-2 gap-4">
-                        {profile.uefExperience.roles.map((role, idx) => (
-                          <div key={idx}>
-                            <p className="text-[10px] font-black text-blue-600 uppercase mb-2">▸ {role.name}</p>
-                            <ul className="text-sm text-slate-600 list-disc ml-4 leading-relaxed space-y-1">
-                              {role.tasks.map((task, i) => (
-                                <li key={i}>{task}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </div>
-
-                  {/* Cột ngoại ngữ */}
-                  <div className="md:col-span-2">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Ngoại ngữ</h3>
-                    <div className="space-y-6 bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm">
-                      {profile.languages.map((lang, i) => (
-                        <div key={lang.name}>
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-base font-bold text-slate-800">{lang.name}</span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-                              {lang.level}
-                            </span>
-                          </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              whileInView={{ width: lang.name === 'Tiếng Anh' ? '65%' : '30%' }}
-                              viewport={{ once: true }}
-                              transition={{ duration: 1.2, delay: i * 0.2, ease: 'easeOut' }}
-                              className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* Personal Projects */}
-              <section className="py-16">
-                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-3">Dự án cá nhân</h3>
-                    <p className="text-slate-500 max-w-2xl leading-relaxed font-medium">
-                      Ba sản phẩm mình trực tiếp xây dựng, tập trung vào trải nghiệm người dùng, hiệu quả vận hành và khả năng triển khai thực tế.
-                    </p>
-                  </div>
-                </div>
-
-                <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }} className="grid grid-cols-1 gap-12">
-                  {projects.personal.map((p, i) => (
-                    <motion.article
-                      key={p.title}
-                      variants={itemVariants}
-                      whileHover={{ y: -6 }}
-                      className="bg-white border border-slate-200/60 rounded-[2.25rem] shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 overflow-hidden group grid xl:grid-cols-[minmax(0,1.9fr)_minmax(360px,0.85fr)]"
-                    >
-                      <div className="relative min-h-[440px] md:min-h-[560px] xl:min-h-[640px] border-b xl:border-b-0 xl:border-r border-slate-200 bg-slate-100 overflow-hidden">
-                        {p.link ? (
-                          <LivePreview url={p.link} title={p.title} />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-8 text-center">
-                            <div className="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center">
-                              <Layout size={28} className="text-slate-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-slate-600 font-bold text-sm">Preview không khả dụng</p>
-                              <p className="text-slate-400 text-xs">Dự án này hiện chưa có live preview.</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-8 md:p-10 flex flex-col flex-1">
-                        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition duration-300 mb-6">
-                          {p.icon}
-                        </div>
-
-                        <h5 className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3">{p.subtitle}</h5>
-                        <h4 className="text-3xl md:text-4xl font-black mb-4 tracking-tight text-slate-900">{p.title}</h4>
-                        <p className="text-sm md:text-base text-slate-500 mb-6 leading-relaxed">{p.desc}</p>
-                        <p className="text-sm md:text-[15px] text-slate-400 mb-8 leading-relaxed flex-1">{p.detail}</p>
-
-                        <div className="flex flex-wrap gap-2 mb-8">
-                          {p.tech.map((t) => (
-                            <span key={t} className="text-[10px] text-slate-500 font-bold uppercase bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg">{t}</span>
-                          ))}
-                        </div>
-
-                        {p.link && (
-                          <a
-                            href={p.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 mt-auto px-5 py-3.5 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600 transition-colors w-fit"
-                          >
-                            Truy cập website <ExternalLink size={16} />
-                          </a>
-                        )}
-                      </div>
-                    </motion.article>
-                  ))}
-                </motion.div>
-              </section>
-            </motion.div>
-          </div>
-
-          {/* =========================================
-              TRANG 2: EVENT TECH (ĐÃ NÂNG CẤP ĐA ẢNH)
-              ========================================= */}
-          <div className={`${activeView === 'event' ? 'block' : 'hidden'}`}>
-            <motion.div animate={{ opacity: activeView === 'event' ? 1 : 0, x: activeView === 'event' ? 0 : 20 }} transition={{ duration: 0.3 }}>
-
-              <section className="pb-20 text-center flex flex-col items-center">
-                <div className="inline-flex justify-center items-center w-16 h-16 rounded-3xl bg-rose-100 text-rose-600 mb-6 shadow-sm">
-                  <Camera size={32} />
-                </div>
-                <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tighter">
-                  Behind The <span className="text-rose-600">Scenes.</span>
-                </h1>
-                <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed">
-                  Không chỉ là người viết code, mình còn là người vận hành sân khấu. Khả năng giải quyết sự cố kỹ thuật "real-time" là điểm mạnh giúp mình luôn giữ cái đầu lạnh trong mọi dự án.
-                </p>
-
-                {/* THẺ TRÍCH DẪN BÀI BÁO (FEATURED ARTICLE) */}
-                <motion.a
-                  href="https://www.uef.edu.vn/servicelearning/phan-hoi-cua-sinh-vien/nguyen-hoang-phuc-minh-lam-viec-dua-tren-ky-luat-chu-khong-phai-bang-dong-luc-25844"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  className="mt-12 inline-flex flex-col md:flex-row items-center gap-5 bg-white border border-rose-100 p-5 md:pr-10 rounded-[2rem] shadow-xl shadow-rose-100/50 group text-left max-w-3xl relative overflow-hidden"
+                <motion.h1 
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                  className="font-kanit font-black uppercase text-white tracking-tighter leading-[0.88] mb-6 cursor-default" 
+                  style={{ fontSize: 'clamp(3rem, 9.5vw, 135px)' }}
                 >
-                  {/* Hiệu ứng lướt sáng */}
-                  <div className="absolute top-0 -inset-full h-full w-1/2 z-0 block transform -skew-x-12 bg-gradient-to-r from-transparent to-rose-50 opacity-40 group-hover:animate-shine" />
+                  HOÀNG PHÚC
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#E2F8EE] via-[#00DF82] to-[#60FFAF]">
+                    TECH &amp; STAGE
+                  </span>
+                </motion.h1>
 
-                  <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shrink-0 relative z-10">
-                    <Quote size={24} className="fill-rose-200" />
-                  </div>
+                <motion.p 
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.2 }}
+                  className="max-w-2xl text-[#E2F8EE]/80 text-base sm:text-lg font-light leading-relaxed mb-8"
+                >
+                  {t.heroTagline}
+                </motion.p>
 
-                  <div className="relative z-10 text-center md:text-left">
-                    <h4 className="text-[15px] md:text-lg font-bold text-slate-900 group-hover:text-rose-600 transition-colors leading-snug mb-1">
-                      "Mình làm việc dựa trên kỷ luật chứ không phải bằng động lực"
-                    </h4>
-                    <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest font-black">
-                      — Chuyện Nhà CSL • UEF Service-Learning
-                    </p>
-                  </div>
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.3 }}
+                  className="flex flex-wrap items-center gap-4 sm:gap-6"
+                >
+                  <a href="#projects" className="shine-btn text-black font-extrabold uppercase tracking-wider text-sm px-8 py-4 rounded-full flex items-center gap-3">
+                    <span>{t.exploreProjects}</span>
+                    <ChevronRight size={18} />
+                  </a>
 
-                  <div className="hidden md:flex ml-auto text-rose-200 group-hover:text-rose-600 transition-colors relative z-10 pl-4 border-l border-slate-100">
-                    <ExternalLink size={24} />
-                  </div>
-                </motion.a>
-              </section>
+                  <a href="#events" className="px-8 py-4 rounded-full border border-[#E2F8EE]/30 hover:border-[#00DF82] text-white hover:text-[#60FFAF] uppercase tracking-wider text-sm font-semibold glass-panel transition-all flex items-center gap-3">
+                    <span>{t.exploreEvents}</span>
+                    <Radio size={16} className="text-[#00DF82]" />
+                  </a>
+                </motion.div>
+              </div>
 
-              {/* Event Gallery Grid */}
-              <section className="pb-32">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {events.map((event) => {
-                    // Bảo vệ: Nếu chưa có mảng images thì dùng mảng tạm hoặc ảnh cũ
-                    const eventImages = event.images || [event.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop'];
+              {/* Right Column: User Portrait Card with /avatar.png */}
+              <div className="lg:col-span-4 flex justify-center lg:justify-end">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="relative group max-w-sm w-full"
+                >
+                  {/* Glowing backlight */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#00DF82]/35 via-[#057A44]/30 to-[#60FFAF]/20 rounded-[2.5rem] blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
 
-                    return (
-                      <motion.div
-                        key={event.id}
-                        whileHover={{ scale: 1.02 }}
-                        className="group relative rounded-[2rem] overflow-hidden aspect-[4/3] bg-slate-200 shadow-lg cursor-pointer border border-slate-200/50"
-                        onClick={() => {
-                          setSelectedEvent({ ...event, images: eventImages }); // Truyền mảng ảnh an toàn vào modal
-                          setActiveImageIndex(0);
+                  {/* Card Container */}
+                  <div className="relative glass-panel rounded-[2.5rem] p-4 border border-[#00DF82]/30 overflow-hidden shadow-2xl">
+                    
+                    {/* Portrait Image */}
+                    <div className="aspect-[4/5] rounded-[2rem] overflow-hidden relative bg-[#050C07]">
+                      <img 
+                        src="/avatar.png" 
+                        alt="Nguyễn Hoàng Phúc" 
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/events/personalpic/nhangiaycsl.jpg';
                         }}
-                      >
-                        {/* Lấy ảnh đầu tiên làm ảnh bìa an toàn */}
-                        <img src={eventImages[0]} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#040806] via-transparent to-transparent opacity-80"></div>
+                      
+                      {/* Live Badge overlay */}
+                      <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#040806]/80 backdrop-blur-md border border-[#00DF82]/40 text-[10px] font-mono text-[#60FFAF] flex items-center gap-1.5 shadow-lg">
+                        <span className="w-2 h-2 rounded-full bg-[#00DF82] animate-ping"></span>
+                        <span>Hoàng Phúc · 2004</span>
+                      </div>
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-100 transition duration-300"></div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <span className="text-[10px] font-mono uppercase text-[#60FFAF] tracking-widest block">Software Developer</span>
+                        <h4 className="font-kanit font-black text-xl text-white">Nguyễn Hoàng Phúc</h4>
+                        <p className="text-[11px] text-[#E2F8EE]/70 font-light mt-0.5">
+                          {lang === 'vi' ? 'Lập trình viên chính thức @ Digiso' : 'Official Software Developer @ Digiso'}
+                        </p>
+                      </div>
+                    </div>
 
-                        {/* Badge hiển thị số lượng ảnh */}
-                        {eventImages.length > 1 && (
-                          <div className="absolute top-6 right-6 bg-black/40 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 border border-white/20">
-                            <Images size={14} /> {eventImages.length}
-                          </div>
-                        )}
+                    {/* Bottom Status bar */}
+                    <div className="pt-3 px-2 flex items-center justify-between text-xs font-mono text-[#E2F8EE]/60">
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles size={13} className="text-[#00DF82]" />
+                        <span>Stage &amp; Code</span>
+                      </span>
+                      <span className="text-[#60FFAF]">phucphuc.id.vn</span>
+                    </div>
 
-                        <div className="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition duration-300">
-                          <span className="inline-block px-3 py-1 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-md mb-3 shadow-md">
-                            {event.year} • {event.role}
-                          </span>
-                          <h3 className="text-2xl font-bold text-white tracking-tight">{event.title}</h3>
-                        </div>
-                      </motion.div>
-                    )
-                  })}
-                </div>
-              </section>
-            </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+
+            </div>
+
           </div>
 
-        {/* --- FOOTER CHUNG --- */}
-        <footer className="py-20 border-t border-slate-200">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold mb-6 italic text-slate-800">Sẵn sàng đồng hành cùng bạn!</h2>
+          {/* Quick Metrics Bar */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="max-w-6xl mx-auto w-full border-t border-[#E2F8EE]/15 pt-8 grid grid-cols-2 md:grid-cols-4 gap-6"
+          >
+            <div>
+              <div className="font-kanit font-black text-3xl sm:text-4xl text-white tracking-tight">{t.metric1Num}</div>
+              <div className="text-xs uppercase tracking-widest text-[#E2F8EE]/50 mt-1">{t.metric1Sub}</div>
+            </div>
+            <div>
+              <div className="font-kanit font-black text-3xl sm:text-4xl text-white tracking-tight">{t.metric2Num}</div>
+              <div className="text-xs uppercase tracking-widest text-[#E2F8EE]/50 mt-1">{t.metric2Sub}</div>
+            </div>
+            <div>
+              <div className="font-kanit font-black text-3xl sm:text-4xl text-white tracking-tight">{t.metric3Num}</div>
+              <div className="text-xs uppercase tracking-widest text-[#E2F8EE]/50 mt-1">{t.metric3Sub}</div>
+            </div>
+            <div>
+              <div className="font-kanit font-black text-3xl sm:text-4xl text-white tracking-tight">{t.metric4Num}</div>
+              <div className="text-xs uppercase tracking-widest text-[#E2F8EE]/50 mt-1">{t.metric4Sub}</div>
+            </div>
+          </motion.div>
 
-            {/* QR Code + Social */}
-            <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-6">
-              <a href={profile.social.portfolio} target="_blank" rel="noopener noreferrer"
-                className="group flex flex-col items-center gap-2 transition-transform hover:scale-105">
-                <div className="bg-white p-3 rounded-2xl border-2 border-blue-600 shadow-lg shadow-blue-500/10">
-                  <img src="/qr-phucphuc.png" alt="QR phucphuc.id.vn" className="w-28 h-28 block" />
+        </section>
+
+        {/* ======================================================== */}
+        {/* KINETIC DOUBLE MARQUEE                                   */}
+        {/* ======================================================== */}
+        <section className="relative py-16 sm:py-24 overflow-hidden select-none">
+          <div className="transform -rotate-[2.5deg] relative z-20 py-3.5 shadow-2xl" style={{ background: 'linear-gradient(90deg, #60FFAF, #00DF82 40%, #A7F3D0 75%, #00DF82)' }}>
+            <div className="marquee-track-left text-[#040806] font-kanit font-black text-lg sm:text-2xl uppercase tracking-widest flex items-center gap-8">
+              <span>MADA AI ASSISTANT</span> <span className="opacity-40">✦</span>
+              <span>TIA CHỚP CONSULT</span> <span className="opacity-40">✦</span>
+              <span>FOUNDERAI.BIZ</span> <span className="opacity-40">✦</span>
+              <span>CSLUEF.COM</span> <span className="opacity-40">✦</span>
+              <span>ASTRODEMY.VN</span> <span className="opacity-40">✦</span>
+              <span>REACT 19</span> <span className="opacity-40">✦</span>
+              <span>NEXT.JS</span> <span className="opacity-40">✦</span>
+              <span>.NET MVC 5</span> <span className="opacity-40">✦</span>
+              <span>SPRING BOOT</span> <span className="opacity-40">✦</span>
+              <span>SQL SERVER</span> <span className="opacity-40">✦</span>
+              <span>DOCKER</span> <span className="opacity-40">✦</span>
+              <span>MADA AI ASSISTANT</span> <span className="opacity-40">✦</span>
+              <span>TIA CHỚP CONSULT</span> <span className="opacity-40">✦</span>
+              <span>FOUNDERAI.BIZ</span> <span className="opacity-40">✦</span>
+            </div>
+          </div>
+
+          <div className="transform rotate-[1.5deg] -mt-5 sm:-mt-7 relative z-10 py-3.5 border-y border-[#00DF82]/40" style={{ background: 'linear-gradient(90deg, #032B18, #051A10 50%, #032B18)' }}>
+            <div className="marquee-track-right text-[#E2F8EE] font-kanit font-black text-lg sm:text-2xl uppercase tracking-widest flex items-center gap-8">
+              <span className="text-[#60FFAF]">STAGE TECHNICAL DIRECTOR</span> <span className="text-[#00DF82]">✦</span>
+              <span>AV OPERATOR</span> <span className="text-[#00DF82]">✦</span>
+              <span className="text-[#60FFAF]">LED SCREEN MAPPING</span> <span className="text-[#00DF82]">✦</span>
+              <span>LIVE AUDIO MIXER</span> <span className="text-[#00DF82]">✦</span>
+              <span className="text-[#60FFAF]">LIGHTING CUE CONTROL</span> <span className="text-[#00DF82]">✦</span>
+              <span>1000+ AUDIENCE CAPACITY</span> <span className="text-[#00DF82]">✦</span>
+              <span className="text-[#60FFAF]">ZERO-FAILURE UNDER PRESSURE</span> <span className="text-[#00DF82]">✦</span>
+              <span className="text-[#60FFAF]">STAGE TECHNICAL DIRECTOR</span> <span className="text-[#00DF82]">✦</span>
+              <span>AV OPERATOR</span> <span className="text-[#00DF82]">✦</span>
+              <span className="text-[#60FFAF]">LED SCREEN MAPPING</span> <span className="text-[#00DF82]">✦</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* ABOUT & DUAL CAPABILITY                                  */}
+        {/* ======================================================== */}
+        <section id="about" className="py-24 px-5 sm:px-8 md:px-12 max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-16 gap-4 border-b border-[#E2F8EE]/15 pb-8">
+            <div>
+              <span className="text-[#00DF82] text-xs font-mono uppercase tracking-[0.3em] block mb-2">{t.capSectionTitle}</span>
+              <h2 className="font-kanit font-black uppercase text-3xl sm:text-5xl text-white tracking-tight">
+                {t.capHeading}
+              </h2>
+            </div>
+            <p className="text-[#E2F8EE]/60 text-sm max-w-md font-light">
+              {t.capDesc}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <motion.div 
+              whileHover={{ y: -4 }}
+              className="glass-panel rounded-3xl p-8 sm:p-10 relative overflow-hidden group"
+            >
+              <div className="absolute top-0 right-0 p-8 text-[#E2F8EE]/5 font-kanit font-black text-7xl select-none group-hover:text-[#00DF82]/15 transition-colors">
+                DEV
+              </div>
+
+              <div className="w-12 h-12 rounded-2xl bg-[#00DF82]/15 border border-[#00DF82]/30 flex items-center justify-center text-[#00DF82] mb-6 shadow-[0_0_15px_rgba(0,223,130,0.2)]">
+                <Code2 size={24} />
+              </div>
+
+              <h3 className="font-kanit font-bold text-2xl uppercase text-white mb-3 tracking-wide">
+                {t.devPillarTitle}
+              </h3>
+              <p className="text-[#E2F8EE]/70 font-light text-sm leading-relaxed mb-6">
+                {t.devPillarDesc}
+              </p>
+
+              <div className="space-y-3 pt-4 border-t border-[#E2F8EE]/10">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[#E2F8EE]/50">{lang === 'vi' ? 'Công việc hiện tại' : 'Current Role'}</span>
+                  <span className="text-[#00DF82] font-bold">DIGISO (08/2026 — Present)</span>
                 </div>
-                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                  phucphuc.id.vn ↗
-                </span>
-              </a>
-              <div className="flex flex-col items-center gap-3">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                  Kết nối nhanh
-                </span>
-                <div className="flex gap-4">
-                  <a href={profile.social.github}
-                    className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white transition shadow-sm"><Github
-                      size={20} /></a>
-                  <a href={profile.social.linkedin}
-                    className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition shadow-sm"><Linkedin
-                      size={20} /></a>
-                  <a href={`mailto:${profile.social.email}`}
-                    className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-rose-500 hover:text-white transition shadow-sm"><Mail
-                      size={20} /></a>
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[#E2F8EE]/50">Frontend Focus</span>
+                  <span className="text-[#60FFAF] font-medium">React 19, Next.js, Tailwind, AI Stream</span>
+                </div>
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[#E2F8EE]/50">Backend &amp; DB</span>
+                  <span className="text-white font-medium">.NET MVC 5, Spring Boot, SQL Server</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              whileHover={{ y: -4 }}
+              className="glass-panel rounded-3xl p-8 sm:p-10 relative overflow-hidden group"
+            >
+              <div className="absolute top-0 right-0 p-8 text-[#E2F8EE]/5 font-kanit font-black text-7xl select-none group-hover:text-[#00DF82]/15 transition-colors">
+                STAGE
+              </div>
+
+              <div className="w-12 h-12 rounded-2xl bg-[#60FFAF]/15 border border-[#60FFAF]/30 flex items-center justify-center text-[#60FFAF] mb-6 shadow-[0_0_15px_rgba(96,255,175,0.2)]">
+                <Radio size={24} />
+              </div>
+
+              <h3 className="font-kanit font-bold text-2xl uppercase text-white mb-3 tracking-wide">
+                {t.stagePillarTitle}
+              </h3>
+              <p className="text-[#E2F8EE]/70 font-light text-sm leading-relaxed mb-6">
+                {t.stagePillarDesc}
+              </p>
+
+              <div className="space-y-3 pt-4 border-t border-[#E2F8EE]/10">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[#E2F8EE]/50">{lang === 'vi' ? 'Chuyên môn AV' : 'AV Expertise'}</span>
+                  <span className="text-[#60FFAF] font-medium">Visual LED Mapping, Mixer, Mic &amp; Stage Flow</span>
+                </div>
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[#E2F8EE]/50">{lang === 'vi' ? 'Show tiêu biểu' : 'Key Shows'}</span>
+                  <span className="text-white font-medium">Vietnam Innovation Summit, AlterCop, EA Summit</span>
+                </div>
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[#E2F8EE]/50">{lang === 'vi' ? 'Nghệ thuật' : 'Music Talent'}</span>
+                  <span className="text-[#00DF82] font-medium">{lang === 'vi' ? 'Nhạc công Organ biểu diễn Talkshow' : 'Organ Instrumental Performance'}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* FEATURED PROJECTS: 5 LIVE PREVIEWS ALWAYS ON             */}
+        {/* ======================================================== */}
+        <section id="projects" className="py-24 px-5 sm:px-8 md:px-12 max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-16 gap-4 border-b border-[#E2F8EE]/15 pb-8">
+            <div>
+              <span className="text-[#00DF82] text-xs font-mono uppercase tracking-[0.3em] block mb-2">{t.projectsSectionTitle}</span>
+              <h2 className="font-kanit font-black uppercase text-3xl sm:text-5xl text-white tracking-tight">
+                {t.projectsHeading}
+              </h2>
+            </div>
+            <p className="text-[#E2F8EE]/60 text-sm max-w-xs font-light">
+              {t.projectsDesc}
+            </p>
+          </div>
+
+          <div className="space-y-16">
+            {projects.personal.map((proj, idx) => (
+              <motion.div 
+                key={proj.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="glass-panel rounded-3xl p-6 sm:p-10 relative overflow-hidden group border border-[#E2F8EE]/15 hover:border-[#00DF82]/50 transition-all shadow-2xl"
+              >
+                {/* Project Header Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-6 border-b border-[#E2F8EE]/10">
+                  <div className="flex items-center gap-3">
+                    <span className="font-kanit font-black text-[#00DF82] text-2xl tracking-wider">0{idx + 1}</span>
+                    <h3 className="font-kanit font-extrabold text-2xl sm:text-3xl uppercase text-white group-hover:text-[#60FFAF] transition-colors">
+                      {proj.title}
+                    </h3>
+                    <span className="px-3 py-1 rounded-full bg-[#00DF82]/15 text-[#60FFAF] text-xs font-mono uppercase tracking-wider hidden sm:inline-block">
+                      {proj.subtitle[lang]}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-xs font-mono text-[#E2F8EE]/70">
+                      <span className="w-2 h-2 rounded-full bg-[#00DF82] animate-pulse"></span>
+                      <span>Live Production</span>
+                    </div>
+                    {proj.link && (
+                      <a 
+                        href={proj.link} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="shine-btn text-black font-extrabold uppercase tracking-wider text-xs px-5 py-2 rounded-full flex items-center gap-1.5"
+                      >
+                        <span>{t.openNewTab}</span>
+                        <ExternalLink size={13} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2-Column Layout: Column 1 = Live Preview Iframe ALWAYS ON, Column 2 = Info */}
+                <div className="grid lg:grid-cols-12 gap-8 items-start">
+                  
+                  {/* LIVE PREVIEW & INTERACTIVE OS WINDOW - ALWAYS ACTIVE & FLAWLESS! */}
+                  <div className="lg:col-span-8 w-full">
+                    <ProjectShowcaseWindow key={proj.id} project={proj} lang={lang} />
+                  </div>
+
+                  {/* PROJECT DETAILS & METRICS */}
+                  <div className="lg:col-span-4 space-y-6">
+                    <div>
+                      <span className="text-xs font-mono text-[#60FFAF] uppercase tracking-wider block mb-1">{t.productDesc}</span>
+                      <p className="text-white font-medium text-sm leading-relaxed mb-3">
+                        {proj.desc[lang]}
+                      </p>
+                      <p className="text-[#E2F8EE]/70 font-light text-xs leading-relaxed">
+                        {proj.detail[lang]}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span className="text-xs font-mono text-[#60FFAF] uppercase tracking-wider block mb-2">{t.techStackLabel}</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {proj.tech.map((techItem) => (
+                          <span key={techItem} className="px-2.5 py-1 rounded-full bg-[#E2F8EE]/10 text-[11px] font-mono text-[#E2F8EE]/80 border border-[#E2F8EE]/10">
+                            {techItem}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-[#08140E] border border-[#00DF82]/20 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[#E2F8EE]/50 font-mono">{lang === 'vi' ? 'Trạng thái' : 'Status'}</span>
+                        <span className="text-[#00DF82] font-mono font-bold">{t.statusActive}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[#E2F8EE]/50 font-mono">{lang === 'vi' ? 'Hiệu năng' : 'Performance'}</span>
+                        <span className="text-[#60FFAF] font-mono font-bold">{t.perfScore}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[#E2F8EE]/50 font-mono">Responsive</span>
+                        <span className="text-white font-mono">{t.responsiveAll}</span>
+                      </div>
+                    </div>
+
+                    {proj.link && (
+                      <a 
+                        href={proj.link} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-[#00DF82] hover:text-[#60FFAF] transition-colors pt-1"
+                      >
+                        <span>{t.visitDirectly} {proj.title}</span>
+                        <ArrowUpRight size={14} />
+                      </a>
+                    )}
+
+                  </div>
+
+                </div>
+
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* LIVE EVENT & STAGE GALLERY (With Filter Tabs)            */}
+        {/* ======================================================== */}
+        <section id="events" className="py-24 px-5 sm:px-8 md:px-12 max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4 border-b border-[#E2F8EE]/15 pb-8">
+            <div>
+              <span className="text-[#00DF82] text-xs font-mono uppercase tracking-[0.3em] block mb-2">{t.eventsSectionTitle}</span>
+              <h2 className="font-kanit font-black uppercase text-3xl sm:text-5xl text-white tracking-tight">
+                {t.eventsHeading}
+              </h2>
+            </div>
+            <p className="text-[#E2F8EE]/60 text-sm max-w-sm font-light">
+              {t.eventsDesc}
+            </p>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex flex-wrap gap-2.5 mb-10">
+            {[
+              { id: 'all', label: t.filterAll },
+              { id: 'featured', label: t.filterFeatured },
+              { id: '2026', label: t.filter2026 },
+              { id: '2025', label: t.filter2025 },
+              { id: '2024', label: t.filter2024 }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setEventFilter(tab.id)}
+                className={`px-5 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${
+                  eventFilter === tab.id 
+                    ? 'bg-[#00DF82] text-black font-bold shadow-[0_0_15px_rgba(0,223,130,0.4)]' 
+                    : 'glass-panel text-[#E2F8EE]/70 hover:text-white hover:border-[#00DF82]/40'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Events Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredEvents.map((ev) => (
+              <motion.div 
+                key={ev.id}
+                layout
+                whileHover={{ y: -6 }}
+                onClick={() => setSelectedEvent(ev)}
+                className="glass-panel rounded-2xl overflow-hidden group relative cursor-pointer"
+              >
+                <div className="aspect-[16/10] overflow-hidden relative">
+                  <img 
+                    src={ev.images[0]} 
+                    alt={ev.title} 
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#040806] via-[#040806]/30 to-transparent"></div>
+                  <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-[#040806]/80 backdrop-blur-md text-[#60FFAF] font-mono text-[10px] border border-[#00DF82]/40">
+                    {ev.role[lang]}
+                  </span>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-[#E2F8EE]/50 uppercase mb-1">
+                    <span>{lang === 'vi' ? `Năm ${ev.year}` : `Year ${ev.year}`}</span>
+                    <span className="text-[#00DF82] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      <span>{t.viewPhotos}</span>
+                      <ArrowUpRight size={12} />
+                    </span>
+                  </div>
+                  <h4 className="font-kanit font-bold text-lg text-white group-hover:text-[#60FFAF] transition-colors">
+                    {ev.title}
+                  </h4>
+                  <p className="text-[#E2F8EE]/60 text-xs mt-2 font-light line-clamp-2">
+                    {ev.desc[lang]}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* EXPERIENCE & TECH STACK                                  */}
+        {/* ======================================================== */}
+        <section id="experience" className="py-24 px-5 sm:px-8 md:px-12 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
+            
+            <div>
+              <span className="text-[#00DF82] text-xs font-mono uppercase tracking-[0.3em] block mb-2">{t.timelineSectionTitle}</span>
+              <h2 className="font-kanit font-black uppercase text-3xl sm:text-4xl text-white tracking-tight mb-8">
+                {t.timelineHeading}
+              </h2>
+
+              <div className="flex flex-col">
+                
+                {/* 1. DIGISO OFFICIAL SOFTWARE DEVELOPER (NEW!) */}
+                <div className="py-6 border-t border-[#00DF82]/30 grid grid-cols-[85px_1fr] sm:grid-cols-[115px_1fr] gap-4 bg-[#00DF82]/5 p-3 rounded-2xl mb-2">
+                  <span className="text-[#00DF82] font-mono text-xs font-bold pt-1">{profile.officialWork.duration[lang]}</span>
+                  <div>
+                    <div className="inline-block px-2 py-0.5 rounded bg-[#00DF82]/20 text-[#60FFAF] font-mono text-[10px] font-bold uppercase mb-1">
+                      {lang === 'vi' ? '● Đang làm việc chính thức' : '● Current Full-time'}
+                    </div>
+                    <h4 className="font-kanit font-bold uppercase text-lg text-white hover:text-[#60FFAF] transition-colors">
+                      {profile.officialWork.title[lang]}
+                    </h4>
+                    <p className="text-[#00DF82] text-sm font-medium mt-0.5">{profile.officialWork.company}</p>
+                    <p className="text-[#E2F8EE]/70 text-xs mt-2 font-light leading-relaxed">{profile.officialWork.note[lang]}</p>
+                  </div>
+                </div>
+
+                {/* 2. DIGISO INTERNSHIP */}
+                <div className="py-6 border-t border-[#E2F8EE]/15 grid grid-cols-[85px_1fr] sm:grid-cols-[115px_1fr] gap-4">
+                  <span className="text-[#E2F8EE]/50 font-mono text-xs pt-1">{profile.internship.duration}</span>
+                  <div>
+                    <h4 className="font-kanit font-bold uppercase text-lg text-white hover:text-[#60FFAF] transition-colors">
+                      {profile.internship.title[lang]}
+                    </h4>
+                    <p className="text-[#E2F8EE]/60 text-sm font-light mt-0.5">{profile.internship.company}</p>
+                    <p className="text-[#E2F8EE]/50 text-xs mt-2 font-light">{profile.internship.note[lang]}</p>
+                  </div>
+                </div>
+
+                {/* 3. UEF TECHNICAL HEAD */}
+                <div className="py-6 border-t border-[#E2F8EE]/15 grid grid-cols-[85px_1fr] sm:grid-cols-[115px_1fr] gap-4">
+                  <span className="text-[#E2F8EE]/50 font-mono text-xs pt-1">{profile.uefExperience.duration}</span>
+                  <div>
+                    <h4 className="font-kanit font-bold uppercase text-lg text-white hover:text-[#60FFAF] transition-colors">
+                      {profile.uefExperience.title[lang]}
+                    </h4>
+                    <p className="text-[#E2F8EE]/60 text-sm font-light mt-0.5">{profile.uefExperience.company} · {profile.uefExperience.years[lang]}</p>
+                    <p className="text-[#E2F8EE]/50 text-xs mt-2 font-light">
+                      {lang === 'vi' 
+                        ? 'Chỉ huy kỹ thuật AV cho 20+ sự kiện lớn, đồng thời code nền tảng quản trị CSLUEF.com (React + .NET MVC 5 + SQL Server).' 
+                        : 'Directed live AV systems for 20+ mega shows while building CSLUEF.com platform (React + .NET MVC 5 + SQL Server).'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4. DEGREE */}
+                <div className="py-6 border-t border-b border-[#E2F8EE]/15 grid grid-cols-[85px_1fr] sm:grid-cols-[115px_1fr] gap-4">
+                  <span className="text-[#E2F8EE]/50 font-mono text-xs pt-1">2022 — 2026</span>
+                  <div>
+                    <h4 className="font-kanit font-bold uppercase text-lg text-white hover:text-[#60FFAF] transition-colors">
+                      {lang === 'vi' ? `Cử nhân ${profile.major[lang]}` : `Bachelor of ${profile.major[lang]}`}
+                    </h4>
+                    <p className="text-[#E2F8EE]/60 text-sm font-light mt-0.5">{profile.university[lang]}</p>
+                    <p className="text-[#E2F8EE]/50 text-xs mt-2 font-light">
+                      {lang === 'vi' 
+                        ? 'Hệ chính quy · Nền tảng cấu trúc dữ liệu, giải thuật, lập trình mạng và phát triển phần mềm.' 
+                        : 'Formal Degree · Data Structures, Algorithms, Network Programming, and Software Architecture.'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <p className="mt-6 text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
-              © 2026 NGUYỄN HOÀNG PHÚC · phucphuc.id.vn
-            </p>
-          </div>
-        </footer>
-      </main>
+            <div>
+              <span className="text-[#00DF82] text-xs font-mono uppercase tracking-[0.3em] block mb-2">{t.arsenalSectionTitle}</span>
+              <h2 className="font-kanit font-black uppercase text-3xl sm:text-4xl text-white tracking-tight mb-8">
+                {t.arsenalHeading}
+              </h2>
 
-      {/* =========================================
-          MODAL 2: THƯ VIỆN ẢNH SỰ KIỆN (MỚI)
-          ========================================= */}
-      <AnimatePresence>
-        {selectedEvent && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
-            onClick={() => setSelectedEvent(null)}
-          >
-            {/* Box Container của Modal */}
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
-              className="bg-white rounded-[2rem] overflow-hidden w-full max-w-5xl max-h-[90vh] flex flex-col md:flex-row shadow-2xl relative"
-              onClick={e => e.stopPropagation()}
-            >
-              {/* Nút Đóng */}
-              <button onClick={() => setSelectedEvent(null)} className="absolute top-4 right-4 z-50 bg-white/50 hover:bg-white text-slate-800 p-2 rounded-full backdrop-blur-md transition shadow-sm">
-                <X size={20} />
-              </button>
-
-              {/* Trái: Khu vực hiển thị ảnh to (Carousel) */}
-              <div className="w-full md:w-3/5 bg-slate-100 relative group aspect-[4/3] md:aspect-auto flex items-center justify-center overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImageIndex}
-                    src={selectedEvent.images[activeImageIndex]}
-                    alt="Event Detail"
-                    className="w-full h-full object-cover"
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </AnimatePresence>
-
-                {/* Nút qua trái/phải nếu sự kiện có nhiều hơn 1 ảnh */}
-                {selectedEvent.images.length > 1 && (
-                  <>
-                    <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100">
-                      <ChevronLeft size={24} />
-                    </button>
-                    <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-md transition opacity-0 group-hover:opacity-100">
-                      <ChevronRight size={24} />
-                    </button>
-                    {/* Chấm hiển thị vị trí ảnh (Dots) */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                      {selectedEvent.images.map((_, idx) => (
-                        <div key={idx} className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === activeImageIndex ? 'bg-white w-6' : 'bg-white/50'}`}></div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Phải: Thông tin chi tiết & Ảnh thu nhỏ */}
-              <div className="w-full md:w-2/5 p-8 md:p-10 flex flex-col bg-white overflow-y-auto max-h-[50vh] md:max-h-none">
-                <span className="text-rose-600 text-[10px] font-black uppercase tracking-widest mb-2">
-                  {selectedEvent.year} • {selectedEvent.role}
-                </span>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
-                  {selectedEvent.title}
-                </h2>
-                <p className="text-slate-600 text-sm mb-8 leading-relaxed font-medium">
-                  {selectedEvent.desc}
-                </p>
-
-                {/* Grid ảnh thu nhỏ (Thumbnails) */}
-                {selectedEvent.images.length > 1 && (
-                  <div className="mt-auto">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Thư viện ảnh ({selectedEvent.images.length})</h4>
-                    <div className="grid grid-cols-4 gap-2">
-                      {selectedEvent.images.map((img, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setActiveImageIndex(idx)}
-                          className={`rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-rose-500 scale-95' : 'border-transparent hover:opacity-80'}`}
+              <div className="space-y-6">
+                {techStack.map((group) => (
+                  <div key={group.category[lang]}>
+                    <h5 className="text-xs uppercase font-mono tracking-widest text-[#E2F8EE]/50 mb-3">{group.category[lang]}</h5>
+                    <div className="flex flex-wrap gap-2">
+                      {group.items.map((techItem) => (
+                        <span 
+                          key={techItem} 
+                          className="px-4 py-1.5 rounded-full border border-[#E2F8EE]/20 text-[#E2F8EE]/90 text-xs font-mono bg-[#E2F8EE]/5 hover:border-[#00DF82] hover:text-[#60FFAF] transition-colors"
                         >
-                          <img src={img} className="w-full h-full object-cover aspect-square" alt="thumbnail" />
-                        </button>
+                          {techItem}
+                        </span>
                       ))}
                     </div>
                   </div>
-                )}
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* LET'S TALK / CONTACT: ZALO, WHATSAPP, TELEGRAM, EMAIL     */}
+        {/* ======================================================== */}
+        <section id="contact" className="relative py-28 px-5 sm:px-8 md:px-12 bg-[#040806] overflow-hidden border-t border-[#E2F8EE]/15">
+          <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 w-[120vw] max-w-[1100px] aspect-[2/1] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(0,223,130,0.25), transparent 70%)' }}></div>
+
+          <div className="relative max-w-6xl mx-auto text-center mb-16">
+            <p className="text-[#E2F8EE]/60 uppercase tracking-[0.3em] text-xs sm:text-sm mb-4 font-mono">
+              {t.contactSectionTitle}
+            </p>
+            <h2 className="font-kanit font-black uppercase text-white tracking-tighter leading-none cursor-default" style={{ fontSize: 'clamp(2.8rem, 11vw, 140px)' }}>
+              {t.contactHeading}
+            </h2>
+          </div>
+
+          <div className="relative max-w-4xl mx-auto grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+            
+            {/* 1. EMAIL */}
+            <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all">
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-[#00DF82]/10 border border-[#00DF82]/20 flex items-center justify-center text-[#00DF82] mb-3">
+                  <Mail size={18} />
+                </div>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">{t.directEmail}</span>
+                <span className="text-white font-medium text-sm select-all break-all group-hover:text-[#60FFAF] transition-colors block mb-4">
+                  {profile.social.email}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 pt-2 border-t border-[#E2F8EE]/10">
+                <button 
+                  onClick={() => handleCopy(profile.social.email, 'email')}
+                  className="flex-1 py-2 px-3 rounded-lg bg-[#E2F8EE]/10 hover:bg-[#00DF82] hover:text-black text-xs font-mono transition-all flex items-center justify-center gap-1.5"
+                >
+                  {copiedType === 'email' ? <Check size={14} className="text-[#00DF82]" /> : <Copy size={14} />}
+                  <span>{copiedType === 'email' ? (lang === 'vi' ? 'Đã chép' : 'Copied!') : (lang === 'vi' ? 'Sao chép' : 'Copy')}</span>
+                </button>
+                <a 
+                  href={`mailto:${profile.social.email}`}
+                  className="p-2 rounded-lg bg-[#00DF82]/20 hover:bg-[#00DF82] text-[#60FFAF] hover:text-black transition-all"
+                  title="Gửi email"
+                >
+                  <ArrowUpRight size={15} />
+                </a>
+              </div>
+            </div>
+
+            {/* 2. ZALO */}
+            <a 
+              href={profile.social.zalo}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+            >
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-3">
+                  <MessageSquare size={18} />
+                </div>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">Zalo Chat / Gọi</span>
+                <span className="text-white font-medium text-base group-hover:text-[#60FFAF] transition-colors block mb-1">
+                  {profile.social.phoneDisplay}
+                </span>
+                <p className="text-xs text-[#E2F8EE]/60 font-light">
+                  {lang === 'vi' ? 'Nhắn tin trực tiếp qua Zalo' : 'Chat directly via Zalo'}
+                </p>
+              </div>
+              <div className="pt-4 flex items-center justify-between text-xs font-mono text-[#00DF82] border-t border-[#E2F8EE]/10">
+                <span>{lang === 'vi' ? 'Mở Zalo' : 'Open Zalo'}</span>
+                <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </div>
+            </a>
+
+            {/* 3. WHATSAPP */}
+            <a 
+              href={profile.social.whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+            >
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3">
+                  <Phone size={18} />
+                </div>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">WhatsApp</span>
+                <span className="text-white font-medium text-base group-hover:text-[#60FFAF] transition-colors block mb-1">
+                  {profile.social.phoneDisplay}
+                </span>
+                <p className="text-xs text-[#E2F8EE]/60 font-light">
+                  {lang === 'vi' ? 'Chat WhatsApp quốc tế nhanh' : 'Instant International WhatsApp'}
+                </p>
+              </div>
+              <div className="pt-4 flex items-center justify-between text-xs font-mono text-[#00DF82] border-t border-[#E2F8EE]/10">
+                <span>WhatsApp Web</span>
+                <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </div>
+            </a>
+
+            {/* 4. TELEGRAM */}
+            <a 
+              href={profile.social.telegram}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+            >
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-3">
+                  <Send size={18} />
+                </div>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">Telegram</span>
+                <span className="text-white font-medium text-base group-hover:text-[#60FFAF] transition-colors block mb-1">
+                  @hoangphuc_capri
+                </span>
+                <p className="text-xs text-[#E2F8EE]/60 font-light">
+                  {lang === 'vi' ? 'Nhắn tin qua Telegram' : 'Direct Message on Telegram'}
+                </p>
+              </div>
+              <div className="pt-4 flex items-center justify-between text-xs font-mono text-[#00DF82] border-t border-[#E2F8EE]/10">
+                <span>t.me/hoangphuc_capri</span>
+                <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </div>
+            </a>
+
+            {/* 5. GITHUB */}
+            <a 
+              href={profile.social.github}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+            >
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white mb-3">
+                  <Github size={18} />
+                </div>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">Source Code</span>
+                <span className="text-white font-medium text-base group-hover:text-[#60FFAF] transition-colors block mb-1">
+                  GitHub Profile
+                </span>
+                <p className="text-xs text-[#E2F8EE]/60 font-light">
+                  hoangphuc1capri
+                </p>
+              </div>
+              <div className="pt-4 flex items-center justify-between text-xs font-mono text-[#00DF82] border-t border-[#E2F8EE]/10">
+                <span>View Repositories</span>
+                <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </div>
+            </a>
+
+            {/* 6. LINKEDIN */}
+            <a 
+              href={profile.social.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+            >
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-600/20 flex items-center justify-center text-blue-400 mb-3">
+                  <Linkedin size={18} />
+                </div>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">Network</span>
+                <span className="text-white font-medium text-base group-hover:text-[#60FFAF] transition-colors block mb-1">
+                  LinkedIn Profile
+                </span>
+                <p className="text-xs text-[#E2F8EE]/60 font-light">
+                  sennahoangphuc0501
+                </p>
+              </div>
+              <div className="pt-4 flex items-center justify-between text-xs font-mono text-[#00DF82] border-t border-[#E2F8EE]/10">
+                <span>Connect on LinkedIn</span>
+                <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </div>
+            </a>
+
+          </div>
+
+          <div className="max-w-6xl mx-auto mt-24 pt-8 border-t border-[#E2F8EE]/15 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#E2F8EE]/40 uppercase tracking-widest">
+            <span>{t.copyright}</span>
+            <span>{t.copyrightRole}</span>
+          </div>
+        </section>
+
+      </main>
+
+      {/* ======================================================== */}
+      {/* CV MODAL A4 PREVIEW (Bilingual Support)                  */}
+      {/* ======================================================== */}
+      <AnimatePresence>
+        {isCvOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsCvOpen(false)}
+            className="fixed inset-0 z-50 bg-[#040806]/90 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-[#040806] border border-[#E2F8EE]/20 rounded-3xl overflow-hidden shadow-2xl"
+            >
+              <div className="px-6 py-4 bg-[#040806] border-b border-[#E2F8EE]/15 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="w-3 h-3 rounded-full bg-rose-500"></span>
+                  <span className="w-3 h-3 rounded-full bg-amber-500"></span>
+                  <span className="w-3 h-3 rounded-full bg-[#00DF82]"></span>
+                  <span className="font-kanit font-bold text-sm tracking-wider uppercase text-white ml-2">
+                    {t.cvModalTitle}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <a 
+                    href="/CV_HoangPhuc.html" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="shine-btn text-black text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full flex items-center gap-2"
+                  >
+                    <Printer size={14} />
+                    <span>{t.printCv}</span>
+                  </a>
+
+                  <button 
+                    onClick={() => setIsCvOpen(false)}
+                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-y-auto p-6 sm:p-10 bg-white text-slate-900 font-sans">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b-2 border-slate-900 pb-8">
+                  <div className="flex items-center gap-5">
+                    <img 
+                      src="/avatar.png" 
+                      alt="Hoàng Phúc" 
+                      className="w-16 h-16 rounded-2xl object-cover border border-slate-300"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                    <div>
+                      <span className="text-xs font-mono font-bold uppercase tracking-[0.25em] text-emerald-600 block mb-1">
+                        Curriculum Vitae · 2026
+                      </span>
+                      <h1 className="font-kanit font-black text-4xl sm:text-5xl uppercase tracking-tight text-slate-900">
+                        {profile.name}
+                      </h1>
+                      <p className="font-medium text-slate-600 text-base mt-1">
+                        {profile.role[lang]}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-xs space-y-1 sm:text-right font-mono text-slate-600">
+                    <div><strong>Email:</strong> {profile.social.email}</div>
+                    <div><strong>Phone:</strong> {profile.social.phoneDisplay}</div>
+                    <div><strong>Portfolio:</strong> {profile.social.portfolio}</div>
+                    <div><strong>GitHub:</strong> {profile.social.github}</div>
+                    <div><strong>Location:</strong> TP. Hồ Chí Minh, Việt Nam</div>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-12 gap-8 pt-8">
+                  <div className="sm:col-span-4 space-y-8 border-b sm:border-b-0 sm:border-r border-slate-200 pb-8 sm:pb-0 sm:pr-6">
+                    <div>
+                      <h3 className="font-kanit font-black uppercase text-xs tracking-widest text-emerald-600 mb-2">{t.summaryHeading}</h3>
+                      <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                        {profile.bio[lang]}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-kanit font-black uppercase text-xs tracking-widest text-emerald-600 mb-3">{t.progSkillsHeading}</h3>
+                      <div className="space-y-2 text-xs">
+                        {techStack.map(g => (
+                          <div key={g.category[lang]}>
+                            <span className="font-bold text-slate-800 block">{g.category[lang]}:</span>
+                            <span className="text-slate-600">{g.items.join(', ')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-kanit font-black uppercase text-xs tracking-widest text-emerald-600 mb-3">{t.stageSkillsHeading}</h3>
+                      <div className="space-y-1.5 text-xs text-slate-600">
+                        <div>• Visual LED Mapping &amp; Screen Control</div>
+                        <div>• Sound Mixer &amp; Wireless Mics</div>
+                        <div>• Lighting Cue &amp; Stage Flow</div>
+                        <div>• Musical Instrument: Organ</div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-kanit font-black uppercase text-xs tracking-widest text-emerald-600 mb-2">{t.eduHeading}</h3>
+                      <div className="text-xs">
+                        <span className="font-bold text-slate-800 block">{profile.university[lang]}</span>
+                        <span className="text-slate-600 block">{lang === 'vi' ? `Cử nhân ${profile.major[lang]}` : `Bachelor of ${profile.major[lang]}`}</span>
+                        <span className="text-slate-400 font-mono block mt-0.5">2022 — 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-8 space-y-8 sm:pl-2">
+                    <div>
+                      <h3 className="font-kanit font-black uppercase text-xs tracking-widest text-emerald-600 mb-4 pb-1 border-b border-slate-200">
+                        {t.workExpHeading}
+                      </h3>
+                      
+                      {/* DIGISO OFFICIAL */}
+                      <div className="mb-5 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                        <div className="flex justify-between items-baseline">
+                          <h4 className="font-bold text-sm text-slate-900 uppercase">{profile.officialWork.title[lang]}</h4>
+                          <span className="font-mono text-[11px] text-emerald-700 font-bold">{profile.officialWork.duration[lang]}</span>
+                        </div>
+                        <div className="text-xs font-bold text-emerald-700 mb-1.5">{profile.officialWork.company}</div>
+                        <p className="text-xs text-slate-700 leading-relaxed">{profile.officialWork.note[lang]}</p>
+                      </div>
+
+                      {/* DIGISO INTERN */}
+                      <div className="mb-5">
+                        <div className="flex justify-between items-baseline">
+                          <h4 className="font-bold text-sm text-slate-900 uppercase">{profile.internship.title[lang]}</h4>
+                          <span className="font-mono text-[11px] text-slate-400">{profile.internship.duration}</span>
+                        </div>
+                        <div className="text-xs font-medium text-emerald-600 mb-1.5">{profile.internship.company}</div>
+                        <p className="text-xs text-slate-600">{profile.internship.note[lang]}</p>
+                      </div>
+
+                      {/* UEF */}
+                      <div>
+                        <div className="flex justify-between items-baseline">
+                          <h4 className="font-bold text-sm text-slate-900 uppercase">{profile.uefExperience.title[lang]}</h4>
+                          <span className="font-mono text-[11px] text-slate-400">{profile.uefExperience.duration} ({profile.uefExperience.years[lang]})</span>
+                        </div>
+                        <div className="text-xs font-medium text-emerald-600 mb-1.5">{profile.uefExperience.company}</div>
+                        <ul className="text-xs text-slate-600 space-y-1 list-disc list-inside">
+                          {profile.uefExperience.roles.map(r => (
+                            <li key={r.name[lang]}><strong>{r.name[lang]}:</strong> {r.tasks[lang]}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-kanit font-black uppercase text-xs tracking-widest text-emerald-600 mb-4 pb-1 border-b border-slate-200">
+                        {t.featuredProjHeading}
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        {projects.personal.map(p => (
+                          <div key={p.title} className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <div className="flex justify-between items-baseline">
+                              <span className="font-bold text-xs uppercase text-slate-900">{p.title}</span>
+                              <span className="text-[10px] font-mono text-emerald-700 font-bold">{p.tech.slice(0, 3).join(' · ')}</span>
+                            </div>
+                            <p className="text-xs text-slate-600 mt-1">{p.desc[lang]}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ======================================================== */}
+      {/* EVENT DETAIL LIGHTBOX MODAL                              */}
+      {/* ======================================================== */}
+      <AnimatePresence>
+        {selectedEvent && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedEvent(null)}
+            className="fixed inset-0 z-50 bg-[#040806]/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-3xl glass-panel border border-[#00DF82]/40 rounded-3xl overflow-hidden p-6 sm:p-8 shadow-2xl"
+            >
+              <button 
+                onClick={() => setSelectedEvent(null)}
+                className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="flex items-center gap-3 mb-4">
+                <span className="px-3 py-1 rounded-full bg-[#00DF82]/20 text-[#60FFAF] font-mono text-xs uppercase">
+                  {selectedEvent.role[lang]}
+                </span>
+                <span className="text-xs font-mono text-[#E2F8EE]/50">{selectedEvent.year}</span>
+              </div>
+
+              <h3 className="font-kanit font-black text-2xl sm:text-3xl text-white mb-3">
+                {selectedEvent.title}
+              </h3>
+              
+              <p className="text-[#E2F8EE]/80 text-sm font-light leading-relaxed mb-6">
+                {selectedEvent.desc[lang]}
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+                {selectedEvent.images.map((img, i) => (
+                  <div key={i} className="rounded-xl overflow-hidden border border-[#E2F8EE]/20 aspect-video">
+                    <img src={img} alt={`${selectedEvent.title} ${i + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                ))}
               </div>
             </motion.div>
           </motion.div>
@@ -760,5 +1739,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

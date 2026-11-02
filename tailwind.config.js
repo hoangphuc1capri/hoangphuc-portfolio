@@ -4,22 +4,32 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class', // <--- THÊM DÒNG NÀY QUAN TRỌNG
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        kanit: ['Kanit', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+      },
+      colors: {
+        cyberDark: '#040806',
+        iceGreen: '#E2F8EE',
+        electricGreen: '#00DF82',
+        emeraldMid: '#057A44',
+        deepEmerald: '#032B18',
+        neonMint: '#60FFAF',
+        mintLight: '#A7F3D0',
       },
       animation: {
-        'scroll': 'scroll 40s linear infinite', // Chỉnh số 40s thành 20s nếu muốn chạy nhanh hơn
+        'scroll': 'scroll 40s linear infinite',
+        'spin-slow': 'spin 22s linear infinite',
       },
       keyframes: {
         scroll: {
           '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-33.33%)' }, // Dịch chuyển 1/3 vì mình nhân 3 danh sách
+          '100%': { transform: 'translateX(-33.33%)' },
         }
       }
-
     },
   },
   plugins: [],

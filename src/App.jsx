@@ -620,28 +620,28 @@ export default function App() {
       />
 
       {/* Floating Header Navigation */}
-      <header className="fixed top-5 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
-        <nav className="glass-panel px-4 sm:px-6 py-3 rounded-full flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+      <header className="fixed top-5 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-[1280px]">
+        <nav className="glass-panel px-4 sm:px-6 lg:px-8 py-3 rounded-full flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
           
-          <a href="#hero" className="flex items-center gap-2 group">
+          <a href="#hero" className="flex items-center gap-2 group shrink-0">
             <span className="w-2.5 h-2.5 rounded-full bg-[#00DF82] group-hover:scale-125 transition-transform shadow-[0_0_12px_#00DF82]"></span>
-            <span className="font-kanit font-black tracking-wider text-lg uppercase text-white group-hover:text-[#60FFAF] transition-colors">
+            <span className="font-kanit font-black tracking-wider text-lg uppercase text-white group-hover:text-[#60FFAF] transition-colors whitespace-nowrap">
               HP<span className="text-[#00DF82]">.DEV</span>
             </span>
           </a>
 
-          <div className="hidden md:flex items-center gap-6 text-xs uppercase tracking-[0.2em] font-medium text-[#E2F8EE]/70">
-            <a href="#about" className="hover:text-white transition-colors">{t.navAbout}</a>
-            <a href="#projects" className="hover:text-white transition-colors">{t.navProjects}</a>
-            <a href="#events" className="hover:text-white transition-colors">{t.navEvents}</a>
-            <a href="#experience" className="hover:text-white transition-colors">{t.navExperience}</a>
-            <a href="#contact" className="hover:text-white transition-colors">{t.navContact}</a>
+          <div className="hidden md:flex items-center gap-4 lg:gap-7 text-xs uppercase tracking-wider font-medium text-[#E2F8EE]/70 whitespace-nowrap">
+            <a href="#about" className="hover:text-white transition-colors whitespace-nowrap">{t.navAbout}</a>
+            <a href="#projects" className="hover:text-white transition-colors whitespace-nowrap">{t.navProjects}</a>
+            <a href="#events" className="hover:text-white transition-colors whitespace-nowrap">{t.navEvents}</a>
+            <a href="#experience" className="hover:text-white transition-colors whitespace-nowrap">{t.navExperience}</a>
+            <a href="#contact" className="hover:text-white transition-colors whitespace-nowrap">{t.navContact}</a>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             
             {/* Language Switcher Pill */}
-            <div className="flex items-center bg-[#040806]/80 border border-[#E2F8EE]/15 rounded-full p-0.5 text-[11px] font-mono">
+            <div className="flex items-center bg-[#040806]/80 border border-[#E2F8EE]/15 rounded-full p-0.5 text-[11px] font-mono shrink-0">
               <button
                 type="button"
                 onClick={() => setLang('vi')}
@@ -659,14 +659,14 @@ export default function App() {
             </div>
 
             {/* Status indicator */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-[#00DF82]/10 border border-[#00DF82]/25 text-[#60FFAF] text-[11px] font-medium">
+            <div className="hidden xl:flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#00DF82]/10 border border-[#00DF82]/25 text-[#60FFAF] text-[11px] font-medium whitespace-nowrap shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-ping"></span>
               <span>{t.openToWork}</span>
             </div>
 
             <button 
               onClick={() => setIsCvOpen(true)}
-              className="shine-btn text-black text-xs uppercase tracking-widest font-black px-4 sm:px-5 py-2.5 rounded-full flex items-center gap-2"
+              className="shine-btn text-black text-xs uppercase tracking-wider font-black px-4 sm:px-5 py-2.5 rounded-full flex items-center gap-2 whitespace-nowrap shrink-0"
             >
               <span>{t.viewCvBtn}</span>
               <ArrowUpRight size={14} className="stroke-[2.5]" />
@@ -1282,16 +1282,16 @@ export default function App() {
             </h2>
           </div>
 
-          <div className="relative max-w-4xl mx-auto grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="relative max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             
             {/* 1. EMAIL */}
-            <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all">
+            <div className="glass-panel p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all">
               <div>
                 <div className="w-10 h-10 rounded-xl bg-[#00DF82]/10 border border-[#00DF82]/20 flex items-center justify-center text-[#00DF82] mb-3">
                   <Mail size={18} />
                 </div>
                 <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">{t.directEmail}</span>
-                <span className="text-white font-medium text-sm select-all break-all group-hover:text-[#60FFAF] transition-colors block mb-4">
+                <span className="text-white font-medium text-sm sm:text-base select-all whitespace-nowrap overflow-hidden text-ellipsis group-hover:text-[#60FFAF] transition-colors block mb-4" title={profile.social.email}>
                   {profile.social.email}
                 </span>
               </div>
@@ -1318,7 +1318,7 @@ export default function App() {
               href={profile.social.zalo}
               target="_blank"
               rel="noreferrer"
-              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+              className="glass-panel p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
             >
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-3">
@@ -1343,7 +1343,7 @@ export default function App() {
               href={profile.social.whatsapp}
               target="_blank"
               rel="noreferrer"
-              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+              className="glass-panel p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
             >
               <div>
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3">
@@ -1368,7 +1368,7 @@ export default function App() {
               href={profile.social.telegram}
               target="_blank"
               rel="noreferrer"
-              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+              className="glass-panel p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
             >
               <div>
                 <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-3">
@@ -1393,7 +1393,7 @@ export default function App() {
               href={profile.social.github}
               target="_blank"
               rel="noreferrer"
-              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+              className="glass-panel p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
             >
               <div>
                 <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white mb-3">
@@ -1418,7 +1418,7 @@ export default function App() {
               href={profile.social.linkedin}
               target="_blank"
               rel="noreferrer"
-              className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
+              className="glass-panel p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[#00DF82]/60 transition-all"
             >
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-600/20 flex items-center justify-center text-blue-400 mb-3">

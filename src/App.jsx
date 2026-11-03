@@ -221,18 +221,18 @@ function MadaAssistantSimulator({ project, lang, fullscreen = false, onToggleFul
 }
 
 // ========================================================
-// INTERACTIVE BROWSER SHOWCASE (Guaranteed 100% Visuals + Iframe Test)
+// REAL WEBPAGE BROWSER SHOWCASE (1440x900 Live Captured Screenshots)
 // ========================================================
 function InteractiveBrowserShowcase({ project, lang, fullscreen = false, onToggleFullscreen }) {
-  const [viewMode, setViewMode] = useState('hd'); // 'hd' or 'iframe'
-  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [madaTab, setMadaTab] = useState('screenshot'); // 'screenshot' or 'chat'
+  const isMada = project.id === 'mada-ai';
 
   const cleanUrl = useMemo(() => {
     return project.link ? project.link.replace(/^https?:\/\//, '') : '';
   }, [project.link]);
 
   return (
-    <div className={`relative ${fullscreen ? 'w-[min(94vw,1320px)] h-[88vh]' : 'w-full h-full min-h-[480px] md:min-h-[540px]'} bg-[#050C07] rounded-2xl overflow-hidden flex flex-col border border-[#00DF82]/30 shadow-2xl`}>
+    <div className={`relative ${fullscreen ? 'w-[min(94vw,1320px)] h-[88vh]' : 'w-full h-full min-h-[460px] md:min-h-[520px]'} bg-[#050C07] rounded-2xl overflow-hidden flex flex-col border border-[#00DF82]/30 shadow-2xl`}>
       {/* OS Browser Bar */}
       <div className="px-4 py-3 bg-[#030805] border-b border-[#E2F8EE]/10 flex items-center justify-between shrink-0 select-none">
         <div className="flex items-center gap-2">
@@ -248,27 +248,33 @@ function InteractiveBrowserShowcase({ project, lang, fullscreen = false, onToggl
           </div>
         </div>
 
-        {/* View Mode Switcher + Actions */}
+        {/* Browser Right Controls */}
         <div className="flex items-center gap-2">
-          {/* Mode Switcher */}
-          <div className="flex items-center bg-[#08140E] border border-[#00DF82]/25 rounded-full p-0.5 text-[10px] font-mono">
-            <button
-              type="button"
-              onClick={() => setViewMode('hd')}
-              className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${viewMode === 'hd' ? 'bg-[#00DF82] text-black font-extrabold shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
-            >
-              <ShieldCheck size={11} />
-              <span>{lang === 'vi' ? 'Chuẩn HD' : 'HD View'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('iframe')}
-              className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${viewMode === 'iframe' ? 'bg-[#00DF82] text-black font-extrabold shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
-            >
-              <Monitor size={11} />
-              <span>{lang === 'vi' ? 'Thử Iframe' : 'Live Iframe'}</span>
-            </button>
-          </div>
+          {isMada && (
+            <div className="flex items-center bg-[#08140E] border border-[#00DF82]/25 rounded-full p-0.5 text-[10px] font-mono">
+              <button
+                type="button"
+                onClick={() => setMadaTab('screenshot')}
+                className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${madaTab === 'screenshot' ? 'bg-[#00DF82] text-black font-extrabold shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
+              >
+                <Monitor size={11} />
+                <span>{lang === 'vi' ? 'Giao diện Web' : 'Live UI'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMadaTab('chat')}
+                className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${madaTab === 'chat' ? 'bg-[#00DF82] text-black font-extrabold shadow-sm' : 'text-[#E2F8EE]/60 hover:text-white'}`}
+              >
+                <Bot size={11} />
+                <span>{lang === 'vi' ? 'Chat Thử' : 'AI Chat'}</span>
+              </button>
+            </div>
+          )}
+
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[#00DF82] hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#00DF82]/10 border border-[#00DF82]/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-pulse"></span>
+            <span>Live 2026</span>
+          </span>
 
           <button
             type="button"
@@ -283,7 +289,7 @@ function InteractiveBrowserShowcase({ project, lang, fullscreen = false, onToggl
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            title="Mở tab mới"
+            title={lang === 'vi' ? 'Mở trực tiếp website' : 'Open live website'}
             className="p-1.5 rounded-lg text-[#00DF82] hover:text-[#60FFAF] hover:bg-[#00DF82]/10 transition-colors"
           >
             <ExternalLink size={13} />
@@ -293,35 +299,42 @@ function InteractiveBrowserShowcase({ project, lang, fullscreen = false, onToggl
 
       {/* Main Viewport */}
       <div className="relative flex-1 w-full h-full bg-[#040806] overflow-hidden flex flex-col">
-        {viewMode === 'hd' ? (
-          /* HD Image Showcase with Interactive HUD */
+        {isMada && madaTab === 'chat' ? (
+          <MadaAssistantSimulator project={project} lang={lang} fullscreen={fullscreen} onToggleFullscreen={onToggleFullscreen} />
+        ) : (
+          /* High-Resolution Real Page Screenshot Showcase */
           <div className="relative flex-1 w-full h-full overflow-y-auto group">
-            {/* Project Screenshot Banner */}
-            <div className="relative w-full min-h-full">
+            {/* Clickable Image to open live website */}
+            <a 
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block relative w-full h-full cursor-pointer"
+            >
               <img 
                 src={project.image} 
-                alt={project.title}
-                className="w-full h-auto object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
+                alt={`${project.title} live interface`}
+                className="w-full h-auto object-cover object-top transition-transform duration-700 group-hover:scale-[1.015]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#040806] via-transparent to-transparent opacity-80 pointer-events-none"></div>
-            </div>
+            </a>
 
-            {/* Floating Top Badge */}
-            <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-[#040806]/85 backdrop-blur-md border border-[#00DF82]/40 text-[#60FFAF] text-[10px] font-mono flex items-center gap-1.5 shadow-lg">
+            {/* Top Badges */}
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+              <span className="px-3 py-1 rounded-full bg-[#040806]/90 backdrop-blur-md border border-[#00DF82]/40 text-[#60FFAF] text-[10px] font-mono flex items-center gap-1.5 shadow-lg">
                 <span className="w-2 h-2 rounded-full bg-[#00DF82] animate-ping"></span>
-                <span>HTTPS · Production 2026</span>
+                <span>Chụp thực tế từ website · 1440×900</span>
               </span>
-              <span className="px-3 py-1 rounded-full bg-[#040806]/85 backdrop-blur-md border border-[#E2F8EE]/15 text-[#E2F8EE]/80 text-[10px] font-mono hidden sm:inline-block">
+              <span className="px-3 py-1 rounded-full bg-[#040806]/90 backdrop-blur-md border border-[#E2F8EE]/15 text-[#E2F8EE]/80 text-[10px] font-mono hidden sm:inline-block">
                 ⚡ Lighthouse 95+
               </span>
             </div>
 
             {/* Bottom Floating Interactive HUD */}
-            <div className="absolute bottom-4 left-4 right-4 z-10 p-4 rounded-2xl bg-[#050E08]/90 backdrop-blur-md border border-[#00DF82]/30 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
+            <div className="absolute bottom-4 left-4 right-4 z-10 p-4 rounded-2xl bg-[#050E08]/92 backdrop-blur-md border border-[#00DF82]/30 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
               <div>
                 <span className="text-[10px] font-mono uppercase text-[#00DF82] tracking-wider block">
-                  {lang === 'vi' ? 'Sản phẩm triển khai thực tế' : 'Live Production Showcase'}
+                  {lang === 'vi' ? 'Giao diện thực tế' : 'Real Website Interface'}
                 </span>
                 <h4 className="font-kanit font-black text-white text-base sm:text-lg">{project.title}</h4>
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -340,50 +353,8 @@ function InteractiveBrowserShowcase({ project, lang, fullscreen = false, onToggl
                   rel="noopener noreferrer"
                   className="shine-btn text-black font-extrabold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full flex items-center gap-2 shadow-lg"
                 >
-                  <span>{lang === 'vi' ? 'Mở Website Trực Tiếp' : 'Launch Website'}</span>
+                  <span>{lang === 'vi' ? 'Mở Website Trực Tiếp' : 'Open Website'}</span>
                   <ArrowUpRight size={14} className="stroke-[2.5]" />
-                </a>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Live Iframe Mode with Safeguard */
-          <div className="relative flex-1 w-full h-full flex flex-col">
-            <iframe
-              src={project.link}
-              title={project.title}
-              className={`w-full flex-1 border-0 ${iframeLoaded ? 'opacity-100' : 'opacity-30'} transition-opacity duration-300`}
-              onLoad={() => setIframeLoaded(true)}
-              onError={() => setIframeLoaded(false)}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            />
-
-            {/* Iframe Safeguard Notice */}
-            <div className="p-3 bg-[#06120A] border-t border-[#00DF82]/20 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-              <div className="flex items-center gap-2 text-[#E2F8EE]/70">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-pulse"></span>
-                <span>
-                  {lang === 'vi'
-                    ? 'Chế độ Iframe trực tiếp. Nếu website chặn nhúng (CSP/X-Frame-Options), màn hình có thể trắng.'
-                    : 'Live Iframe mode. If blocked by remote CSP/X-Frame-Options, iframe may appear blank.'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('hd')}
-                  className="px-3 py-1 rounded-full bg-[#00DF82]/20 text-[#60FFAF] border border-[#00DF82]/40 text-[11px] font-bold hover:bg-[#00DF82] hover:text-black transition-colors"
-                >
-                  {lang === 'vi' ? 'Quay về Chuẩn HD' : 'Switch to HD View'}
-                </button>
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1 rounded-full bg-[#00DF82] text-black font-black text-[11px] flex items-center gap-1 hover:bg-[#60FFAF] transition-colors"
-                >
-                  <span>{lang === 'vi' ? 'Mở Web' : 'Open'}</span>
-                  <ExternalLink size={12} />
                 </a>
               </div>
             </div>
@@ -402,21 +373,12 @@ function ProjectShowcaseWindow({ project, lang }) {
 
   return (
     <div className="relative w-full h-full">
-      {project.type === 'ai-assistant' ? (
-        <MadaAssistantSimulator 
-          project={project} 
-          lang={lang} 
-          fullscreen={false} 
-          onToggleFullscreen={() => setIsFullscreen(true)} 
-        />
-      ) : (
-        <InteractiveBrowserShowcase 
-          project={project} 
-          lang={lang} 
-          fullscreen={false} 
-          onToggleFullscreen={() => setIsFullscreen(true)} 
-        />
-      )}
+      <InteractiveBrowserShowcase 
+        project={project} 
+        lang={lang} 
+        fullscreen={false} 
+        onToggleFullscreen={() => setIsFullscreen(true)} 
+      />
 
       {/* Fullscreen Overlay */}
       <AnimatePresence>
@@ -435,21 +397,12 @@ function ProjectShowcaseWindow({ project, lang }) {
               onClick={(e) => e.stopPropagation()}
               className="relative"
             >
-              {project.type === 'ai-assistant' ? (
-                <MadaAssistantSimulator 
-                  project={project} 
-                  lang={lang} 
-                  fullscreen={true} 
-                  onToggleFullscreen={() => setIsFullscreen(false)} 
-                />
-              ) : (
-                <InteractiveBrowserShowcase 
-                  project={project} 
-                  lang={lang} 
-                  fullscreen={true} 
-                  onToggleFullscreen={() => setIsFullscreen(false)} 
-                />
-              )}
+              <InteractiveBrowserShowcase 
+                project={project} 
+                lang={lang} 
+                fullscreen={true} 
+                onToggleFullscreen={() => setIsFullscreen(false)} 
+              />
             </motion.div>
           </motion.div>
         )}

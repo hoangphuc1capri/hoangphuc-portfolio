@@ -105,8 +105,8 @@ export const projects = {
         vi: "Trợ lý AI thông minh cho doanh nghiệp đa nền tảng",
         en: "Intelligent Enterprise AI Conversational Assistant"
       },
-      image: "/projects/mada-logo.png",
-      type: "ai-assistant",
+      image: "/projects/mada.png",
+      type: "web-showcase",
       highlights: [
         { vi: "Streaming Chat Real-time", en: "Real-time Streaming Chat" },
         { vi: "Digiso Enterprise Engine", en: "Digiso Enterprise Engine" },
@@ -186,7 +186,7 @@ export const projects = {
         vi: "Hệ thống số hóa quản lý CLB & Sinh viên UEF",
         en: "Community Management Platform for 500+ Students"
       },
-      image: "/projects/csl-1.png",
+      image: "/projects/csluef.png",
       type: "web-showcase",
       highlights: [
         { vi: "500+ Sinh viên hoạt động", en: "500+ Active Students" },
@@ -213,7 +213,7 @@ export const projects = {
         vi: "Tư vấn & đo lường Well-being (Cá nhân & Doanh nghiệp B2B)",
         en: "Well-being Consultation & Psychological Assessment Platform"
       },
-      image: "/projects/astrodemy.jpg",
+      image: "/projects/astrodemy.png",
       type: "web-showcase",
       highlights: [
         { vi: "Trắc nghiệm Well-being Online", en: "Online Well-being Test" },

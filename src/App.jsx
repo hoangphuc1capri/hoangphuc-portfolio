@@ -1389,14 +1389,14 @@ export default function App() {
                 </div>
                 <span className="text-[11px] font-mono uppercase tracking-widest text-[#E2F8EE]/40 block mb-1">Telegram</span>
                 <span className="text-white font-medium text-base group-hover:text-[#60FFAF] transition-colors block mb-1">
-                  @hoangphuc_capri
+                  @sennahoangphuc
                 </span>
                 <p className="text-xs text-[#E2F8EE]/60 font-light">
                   {lang === 'vi' ? 'Nhắn tin qua Telegram' : 'Direct Message on Telegram'}
                 </p>
               </div>
               <div className="pt-4 flex items-center justify-between text-xs font-mono text-[#00DF82] border-t border-[#E2F8EE]/10">
-                <span>t.me/hoangphuc_capri</span>
+                <span>t.me/sennahoangphuc</span>
                 <ArrowUpRight size={15} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </div>
             </a>

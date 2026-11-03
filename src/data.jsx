@@ -92,7 +92,7 @@ export const profile = {
     portfolio: "https://phucphuc.id.vn",
     zalo: "https://zalo.me/0844790999",
     whatsapp: "https://wa.me/84844790999",
-    telegram: "https://t.me/hoangphuc_capri"
+    telegram: "https://t.me/sennahoangphuc"
   }
 };
 

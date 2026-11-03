@@ -623,11 +623,24 @@ export default function App() {
       <header className="fixed top-5 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-[1280px]">
         <nav className="glass-panel px-4 sm:px-6 lg:px-8 py-3 rounded-full flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
           
-          <a href="#hero" className="flex items-center gap-2 group shrink-0">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#00DF82] group-hover:scale-125 transition-transform shadow-[0_0_12px_#00DF82]"></span>
-            <span className="font-kanit font-black tracking-wider text-lg uppercase text-white group-hover:text-[#60FFAF] transition-colors whitespace-nowrap">
-              HP<span className="text-[#00DF82]">.DEV</span>
-            </span>
+          <a href="#hero" className="flex items-center gap-3.5 group shrink-0">
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0 flex items-center justify-center">
+              {/* Soft Neon Ambient Glow */}
+              <div className="absolute inset-0 bg-[#00DF82]/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
+              <img 
+                src="/logo.png" 
+                alt="Hoàng Phúc Logo" 
+                className="relative w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(0,223,130,0.6)] group-hover:scale-110 transition-transform duration-300" 
+              />
+            </div>
+            <div className="flex flex-col select-none">
+              <span className="font-kanit font-black tracking-wider text-base sm:text-lg uppercase text-white group-hover:text-[#60FFAF] transition-colors leading-tight">
+                HOÀNG PHÚC
+              </span>
+              <span className="text-[9px] font-mono tracking-[0.25em] text-[#00DF82] uppercase font-bold leading-none mt-0.5">
+                TECH &amp; STAGE
+              </span>
+            </div>
           </a>
 
           <div className="hidden md:flex items-center gap-4 lg:gap-7 text-xs uppercase tracking-wider font-medium text-[#E2F8EE]/70 whitespace-nowrap">
@@ -1441,7 +1454,12 @@ export default function App() {
           </div>
 
           <div className="max-w-6xl mx-auto mt-24 pt-8 border-t border-[#E2F8EE]/15 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#E2F8EE]/40 uppercase tracking-widest">
-            <span>{t.copyright}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(0,223,130,0.5)]" />
+              </div>
+              <span>{t.copyright}</span>
+            </div>
             <span>{t.copyrightRole}</span>
           </div>
         </section>
@@ -1499,21 +1517,24 @@ export default function App() {
 
               <div className="overflow-y-auto p-6 sm:p-10 bg-white text-slate-900 font-sans">
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b-2 border-slate-900 pb-8">
-                  <div className="flex items-center gap-5">
-                    <img 
-                      src="/avatar.png" 
-                      alt="Hoàng Phúc" 
-                      className="w-16 h-16 rounded-2xl object-cover border border-slate-300"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
+                  <div className="flex items-center gap-5 sm:gap-6">
+                    <div className="w-24 h-28 sm:w-28 sm:h-32 md:w-32 md:h-36 rounded-2xl overflow-hidden border-2 border-emerald-500/30 shadow-lg shrink-0 bg-slate-100">
+                      <img 
+                        src="/avatar.png" 
+                        alt="Hoàng Phúc" 
+                        className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-300"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    </div>
                     <div>
-                      <span className="text-xs font-mono font-bold uppercase tracking-[0.25em] text-emerald-600 block mb-1">
+                      <span className="text-xs font-mono font-bold uppercase tracking-[0.25em] text-emerald-600 flex items-center gap-2 mb-1">
+                        <img src="/logo.png" alt="Logo" className="w-4 h-4 object-contain" />
                         Curriculum Vitae · 2026
                       </span>
-                      <h1 className="font-kanit font-black text-4xl sm:text-5xl uppercase tracking-tight text-slate-900">
+                      <h1 className="font-kanit font-black text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-slate-900 leading-none">
                         {profile.name}
                       </h1>
-                      <p className="font-medium text-slate-600 text-base mt-1">
+                      <p className="font-medium text-slate-600 text-sm sm:text-base mt-2">
                         {profile.role[lang]}
                       </p>
                     </div>
